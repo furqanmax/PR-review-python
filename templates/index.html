@@ -1,0 +1,1373 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="color-scheme" content="light dark">
+<title>PR Review Runner</title>
+<link rel="stylesheet" href="/static/ui.css">
+<style>
+
+  .topbar { border-bottom: 1px solid hsl(var(--border)); background: hsl(var(--background) / .85); position: sticky; top: 0; z-index: 20; backdrop-filter: blur(8px); }
+  .topbar .container { display: flex; align-items: center; gap: .75rem; height: 3.5rem; }
+  .brand { display: flex; align-items: center; gap: .6rem; font-weight: 600; }
+  .logo { width: 1.75rem; height: 1.75rem; border-radius: .45rem; background: hsl(var(--primary)); color: hsl(var(--primary-foreground));
+          display: grid; place-items: center; font-size: .8rem; font-weight: 700; }
+  main.container { padding-top: 1.5rem; padding-bottom: 3rem; }
+  .intro { margin-bottom: 1.25rem; } .intro p { margin-top: .25rem; }
+  .layout { display: grid; grid-template-columns: minmax(0, 430px) minmax(0, 1fr); gap: 1rem; align-items: start; }
+  @media (max-width: 960px) { .layout { grid-template-columns: 1fr; } }
+  @media (max-width: 640px) { .topbar .badge { display: none; } }
+  .col { display: flex; flex-direction: column; gap: 1rem; min-width: 0; }
+  .steps { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: .5rem; }
+  @media (max-width: 640px) { .steps { grid-template-columns: 1fr 1fr; } }
+  .step { border: 1px solid hsl(var(--border)); border-radius: var(--radius); padding: .65rem .75rem; font-size: .75rem; min-width: 0; }
+  .step b { display: block; font-size: .8125rem; margin-bottom: .3rem; font-weight: 500; }
+  .step .st { color: hsl(var(--muted-foreground)); overflow-wrap: anywhere; display: block; margin-top: .3rem; }
+  .step.run { border-color: hsl(var(--info) / .6); } .step.done { border-color: hsl(var(--success) / .6); }
+  .step.fail { border-color: hsl(var(--destructive) / .6); } .step.skip { opacity: .55; }
+  .jobs { display: flex; flex-direction: column; }
+  .jobs button { display: flex; justify-content: space-between; align-items: center; gap: .5rem; width: 100%; padding: .55rem .25rem;
+                 background: none; border: 0; border-bottom: 1px solid hsl(var(--border)); color: inherit; font: .8125rem var(--font); cursor: pointer; text-align: left; }
+  .jobs button:last-child { border-bottom: 0; } .jobs button:hover { background: hsl(var(--muted) / .5); }
+  .rep-bar { display: flex; gap: .5rem; align-items: center; flex-wrap: wrap; }
+  .rep-bar .select { flex: 1 1 260px; width: auto; }
+  .filters { display: flex; gap: .5rem; align-items: center; flex-wrap: wrap; margin: 1rem 0; }
+  .filters .input { flex: 1 1 220px; width: auto; }
+  td.sugg { min-width: 260px; max-width: 520px; }
+  td.jira { width: 1%; white-space: nowrap; text-align: right; }
+  .detail-grid { display: flex; flex-direction: column; gap: .75rem; padding: .25rem 0; }
+  .detail-grid h4 { font-size: .75rem; text-transform: uppercase; letter-spacing: .04em; color: hsl(var(--muted-foreground)); display: flex; gap: .5rem; align-items: center; margin-bottom: .35rem; }
+  .detail-grid pre { max-height: 340px; background: hsl(var(--background)); }
+  .jerr { color: hsl(var(--destructive)); font-size: .75rem; margin-bottom: .5rem; }
+  .delivery { font-size: .8125rem; }
+  .fmt-wrap { display: flex; flex-direction: column; gap: .4rem; }
+  .opts { display: flex; flex-direction: column; gap: .5rem; }
+  .opt { display: flex; gap: .7rem; align-items: flex-start; padding: .7rem .8rem; border: 1px solid hsl(var(--border)); border-radius: var(--radius); cursor: pointer; transition: border-color .15s, background .15s; }
+  .opt:hover { background: hsl(var(--muted) / .4); }
+  .opt input { width: 1rem; height: 1rem; margin: .15rem 0 0; accent-color: hsl(var(--primary)); flex: none; }
+  .opt:has(input:checked) { border-color: hsl(var(--ring) / .7); background: hsl(var(--muted) / .35); }
+  .opt b { font-size: .8125rem; font-weight: 600; display: flex; gap: .4rem; align-items: center; flex-wrap: wrap; }
+  .opt span.d { display: block; color: hsl(var(--muted-foreground)); font-size: .75rem; margin-top: .15rem; line-height: 1.45; }
+  .repo-info { display: flex; gap: .4rem; flex-wrap: wrap; align-items: center; margin: .5rem 0 .25rem; font-size: .75rem; color: hsl(var(--muted-foreground)); }
+  .share-line { display: flex; gap: .5rem; align-items: center; flex-wrap: wrap; margin-top: 1rem; padding: .6rem .75rem; border: 1px solid hsl(var(--border)); border-radius: var(--radius); font-size: .8125rem; }
+  dialog.modal { width: min(920px, calc(100vw - 2rem)); max-height: calc(100vh - 2rem); padding: 0; border: 1px solid hsl(var(--border)); border-radius: calc(var(--radius) + 4px);
+                 background: hsl(var(--card)); color: hsl(var(--card-foreground)); box-shadow: 0 20px 50px rgb(0 0 0 / .25); }
+  dialog.modal::backdrop { background: rgb(0 0 0 / .45); backdrop-filter: blur(2px); }
+  .modal-head { display: flex; align-items: center; gap: .75rem; padding: 1rem 1.25rem; border-bottom: 1px solid hsl(var(--border)); position: sticky; top: 0; background: hsl(var(--card)); z-index: 2; }
+  .modal-body { padding: 1rem 1.25rem 1.25rem; }
+  .set-section + .set-section { margin-top: 1.5rem; }
+  .set-section h3 { font-size: .9375rem; font-weight: 600; margin-bottom: .2rem; }
+  .map-form { border: 1px solid hsl(var(--border)); border-radius: var(--radius); padding: 1rem; margin-top: .75rem; background: hsl(var(--muted) / .25); }
+  .map-form .grid-3 { margin-top: .75rem; } .map-form .grid-2 { margin-top: .75rem; }
+  td.acts { white-space: nowrap; text-align: right; width: 1%; }
+  @media (max-width: 640px) { .map-form .grid-2, .map-form .grid-3 { grid-template-columns: 1fr; } }
+  .user-chip { display: flex; align-items: center; gap: .4rem; font-size: .8125rem; }
+  .user-chip .who { max-width: 180px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+  @media (max-width: 640px) { .user-chip .who { display: none; } }
+  .popover .select, .popover .input { width: 100%; }
+  .popover .check { margin-top: .6rem; font-size: .8125rem; }
+  .popover .label + .select { margin-bottom: .6rem; }
+  .repo-chips { display: flex; flex-wrap: wrap; gap: .3rem; }
+
+  /* ---------- app shell: top bar + left navigation ---------- */
+  body { background: hsl(var(--background)); }
+  .topbar .bar { display: flex; align-items: center; gap: .6rem; height: 3.5rem; padding: 0 1rem; }
+  .crumb { color: hsl(var(--muted-foreground)); font-size: .875rem; display: flex; gap: .4rem; align-items: center; min-width: 0; }
+  .crumb b { color: hsl(var(--foreground)); font-weight: 500; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  .crumb .sep { opacity: .5; }
+  .status-group { display: flex; gap: .35rem; align-items: center; }
+  .shell { display: grid; grid-template-columns: 236px minmax(0, 1fr); min-height: calc(100vh - 3.5rem);
+           background: linear-gradient(to right, hsl(var(--muted) / .3) 235px, hsl(var(--border)) 235px 236px, transparent 236px); }
+  .sidenav { position: sticky; top: 3.5rem; height: calc(100vh - 3.5rem); overflow-y: auto; padding: .75rem .6rem 1rem; display: flex; flex-direction: column; }
+  .nav-group { font-size: .6875rem; text-transform: uppercase; letter-spacing: .06em; color: hsl(var(--muted-foreground)); font-weight: 600; padding: 1rem .65rem .35rem; }
+  .nav-group:first-child { padding-top: .25rem; }
+  .nav-link { display: flex; align-items: center; gap: .6rem; padding: .45rem .65rem; border-radius: calc(var(--radius) - 2px); font-size: .875rem;
+              color: hsl(var(--muted-foreground)); text-decoration: none; line-height: 1.25; }
+  .nav-link svg { width: 1rem; height: 1rem; flex: none; stroke: currentColor; fill: none; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; }
+  .nav-link:hover { background: hsl(var(--accent)); color: hsl(var(--foreground)); text-decoration: none; }
+  .nav-link[aria-current="page"] { background: hsl(var(--secondary)); color: hsl(var(--foreground)); font-weight: 500; box-shadow: inset 2px 0 0 hsl(var(--foreground)); }
+  .nav-link .count { margin-left: auto; font-size: .6875rem; padding: 0 .45rem; border-radius: 9999px; background: hsl(var(--info) / .15); color: hsl(var(--info)); font-weight: 600; }
+  .nav-foot { margin-top: auto; padding: 1rem .65rem 0; font-size: .75rem; color: hsl(var(--muted-foreground)); border-top: 1px solid hsl(var(--border)); }
+  .nav-foot .row { gap: .4rem; }
+  .content { padding: 1.5rem 1.75rem 3rem; min-width: 0; max-width: 1320px; width: 100%; }
+  .page-head { display: flex; align-items: flex-end; gap: 1rem; flex-wrap: wrap; margin-bottom: 1.25rem; }
+  .page-head h1 { font-size: 1.5rem; } .page-head p { margin-top: .2rem; }
+  .page-head .actions { display: flex; gap: .5rem; flex-wrap: wrap; margin-left: auto; }
+  .view { display: none; } .view.active { display: block; }
+  #navToggle { display: none; }
+  .scrim { display: none; }
+  @media (max-width: 900px) {
+    #navToggle { display: inline-flex; }
+    .shell { grid-template-columns: 1fr; background: none; }
+    .sidenav { position: fixed; z-index: 40; left: 0; top: 3.5rem; width: 260px; background: hsl(var(--background)); border-right: 1px solid hsl(var(--border)); transform: translateX(-100%);
+               transition: transform .18s ease; box-shadow: 0 10px 30px rgb(0 0 0 / .2); }
+    body.nav-open .sidenav { transform: none; }
+    body.nav-open .scrim { display: block; position: fixed; inset: 3.5rem 0 0 0; z-index: 30; background: rgb(0 0 0 / .35); }
+    .content { padding: 1rem 1rem 2.5rem; }
+    .status-group { display: none; }
+  }
+  @media (max-width: 560px) { .brand .name, .crumb { display: none; } }
+
+  /* user menu */
+  .usermenu { position: relative; }
+  .usermenu > summary { list-style: none; display: flex; align-items: center; gap: .5rem; cursor: pointer; padding: .2rem .35rem .2rem .2rem; border-radius: 9999px; border: 1px solid hsl(var(--border)); }
+  .usermenu > summary::-webkit-details-marker { display: none; }
+  .usermenu > summary:hover { background: hsl(var(--accent)); }
+  .avatar { width: 1.75rem; height: 1.75rem; border-radius: 9999px; background: hsl(var(--primary)); color: hsl(var(--primary-foreground));
+            display: grid; place-items: center; font-size: .7rem; font-weight: 700; flex: none; }
+  .usermenu .who { font-size: .8125rem; max-width: 160px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+  @media (max-width: 720px) { .usermenu .who { display: none; } }
+  .menu { position: absolute; right: 0; top: calc(100% + .4rem); width: 270px; z-index: 60; background: hsl(var(--popover)); color: hsl(var(--popover-foreground));
+          border: 1px solid hsl(var(--border)); border-radius: var(--radius); box-shadow: 0 12px 30px rgb(0 0 0 / .18); padding: .35rem; }
+  .menu .menu-head { padding: .6rem .65rem; border-bottom: 1px solid hsl(var(--border)); margin-bottom: .3rem; font-size: .8125rem; }
+  .menu .menu-head .muted { font-size: .75rem; overflow-wrap: anywhere; }
+  .menu a, .menu button { display: flex; width: 100%; gap: .5rem; align-items: center; padding: .45rem .65rem; border-radius: calc(var(--radius) - 2px);
+                          font: .8125rem var(--font); color: inherit; background: none; border: 0; cursor: pointer; text-decoration: none; text-align: left; }
+  .menu a:hover, .menu button:hover { background: hsl(var(--accent)); text-decoration: none; }
+
+  /* ---------- dashboard ---------- */
+  .tiles { display: grid; grid-template-columns: repeat(6, minmax(0, 1fr)); gap: .75rem; margin-bottom: 1rem; }
+  @media (max-width: 1200px) { .tiles { grid-template-columns: repeat(3, minmax(0, 1fr)); } }
+  @media (max-width: 560px) { .tiles { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
+  .tile { border: 1px solid hsl(var(--border)); border-radius: var(--radius); background: hsl(var(--card)); padding: .9rem 1rem; min-width: 0; text-decoration: none; color: inherit; display: block; }
+  a.tile:hover { border-color: hsl(var(--ring) / .4); text-decoration: none; }
+  .tile .t-label { font-size: .75rem; color: hsl(var(--muted-foreground)); font-weight: 500; display: flex; gap: .35rem; align-items: center; }
+  .tile .t-value { font-size: 1.65rem; font-weight: 700; letter-spacing: -.02em; line-height: 1.2; margin-top: .2rem; font-variant-numeric: tabular-nums; }
+  .tile .t-sub { font-size: .75rem; color: hsl(var(--muted-foreground)); margin-top: .15rem; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  .tile .mark { width: .5rem; height: .5rem; border-radius: 2px; display: inline-block; }
+  .dash-grid { display: grid; grid-template-columns: repeat(12, minmax(0, 1fr)); gap: 1rem; }
+  .dash-grid > * { grid-column: span 6; min-width: 0; }
+  .dash-grid > .w4 { grid-column: span 4; } .dash-grid > .w8 { grid-column: span 8; } .dash-grid > .w12 { grid-column: span 12; }
+  @media (max-width: 1100px) { .dash-grid > *, .dash-grid > .w4, .dash-grid > .w8 { grid-column: span 12; } }
+  .sevbar { display: flex; gap: 2px; height: 14px; border-radius: 4px; overflow: hidden; background: hsl(var(--muted)); margin: .25rem 0 1rem; }
+  .sevbar > span { display: block; height: 100%; min-width: 3px; background: hsl(var(--c)); }
+  .legend { display: grid; grid-template-columns: 1fr auto auto; gap: .45rem 1rem; font-size: .8125rem; align-items: center; }
+  .legend .k { display: flex; gap: .5rem; align-items: center; } .legend .k i { width: .625rem; height: .625rem; border-radius: 2px; background: hsl(var(--c)); display: inline-block; }
+  .legend .v { font-variant-numeric: tabular-nums; font-weight: 600; text-align: right; } .legend .p { color: hsl(var(--muted-foreground)); text-align: right; font-variant-numeric: tabular-nums; }
+  .bars { display: flex; align-items: flex-end; gap: 2px; height: 150px; border-bottom: 1px solid hsl(var(--border)); padding-top: 1.2rem; position: relative; }
+  .bars .col { flex: 1 1 0; height: 100%; display: flex; flex-direction: row; gap: 0; align-items: flex-end; justify-content: center; cursor: default; position: relative; min-width: 0; }
+  .bars .col:hover { background: hsl(var(--muted) / .6); }
+  .bars .col > i { display: block; width: 100%; max-width: 26px; background: hsl(var(--info)); border-radius: 4px 4px 0 0; min-height: 0; }
+  .bars .col.zero > i { height: 2px !important; background: hsl(var(--border)); border-radius: 0; }
+  .bars .col .lbl { position: absolute; bottom: calc(var(--h) + 3px); font-size: .6875rem; font-weight: 600; color: hsl(var(--foreground)); white-space: nowrap; }
+  .bars .col[data-tip]:hover::after { right: auto; left: 50%; transform: translateX(-50%); white-space: nowrap; }
+  .bars-x { display: flex; justify-content: space-between; font-size: .6875rem; color: hsl(var(--muted-foreground)); margin-top: .35rem; }
+  .bars .ymax { position: absolute; top: 0; left: 0; font-size: .6875rem; color: hsl(var(--muted-foreground)); }
+  .hbar { display: grid; grid-template-columns: minmax(0, 1fr) auto; gap: .2rem .75rem; align-items: center; font-size: .8125rem; }
+  .hbar + .hbar { margin-top: .6rem; }
+  .hbar .track { grid-column: 1 / -1; height: 6px; border-radius: 4px; background: hsl(var(--muted)); overflow: hidden; }
+  .hbar .track > i { display: block; height: 100%; border-radius: 4px; background: hsl(var(--info)); }
+  .hbar .v { font-variant-numeric: tabular-nums; font-weight: 600; }
+  .sys { display: flex; flex-direction: column; }
+  .sys .s-row { display: flex; gap: .65rem; align-items: center; padding: .55rem 0; font-size: .8125rem; border-bottom: 1px solid hsl(var(--border)); }
+  .sys .s-row:last-child { border-bottom: 0; }
+  .sys .s-row .grow { min-width: 0; } .sys .s-row .muted { font-size: .75rem; overflow-wrap: anywhere; }
+  .sev-mini { display: inline-flex; gap: .3rem; flex-wrap: wrap; }
+  .sev-mini span { font-size: .7rem; padding: 0 .4rem; border-radius: 9999px; border: 1px solid hsl(var(--border)); white-space: nowrap; display: inline-flex; gap: .25rem; align-items: center; }
+  .sev-mini span i { width: .45rem; height: .45rem; border-radius: 2px; background: hsl(var(--c)); display: inline-block; }
+  tr.link { cursor: pointer; } tr.link:hover td { background: hsl(var(--muted) / .45); }
+  .quick { display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: .75rem; }
+  .quick a { display: flex; gap: .7rem; align-items: center; padding: .8rem .9rem; border: 1px solid hsl(var(--border)); border-radius: var(--radius); color: inherit; text-decoration: none; background: hsl(var(--card)); }
+  .quick a:hover { border-color: hsl(var(--ring) / .45); background: hsl(var(--muted) / .35); }
+  .quick a b { display: block; font-size: .8125rem; font-weight: 600; } .quick a span.d { font-size: .75rem; color: hsl(var(--muted-foreground)); }
+  .quick svg { width: 1.15rem; height: 1.15rem; stroke: currentColor; fill: none; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; flex: none; }
+  .role-sel { height: 1.9rem; padding: 0 .5rem; font-size: .8125rem; width: auto; min-width: 140px; }
+  .settings-card + .settings-card { margin-top: 1rem; }
+  .acc-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 1rem; }
+  @media (max-width: 900px) { .acc-grid { grid-template-columns: 1fr; } }
+</style>
+</head>
+<body>
+<header class="topbar">
+  <div class="bar">
+    <button class="btn btn-ghost btn-sm btn-icon" id="navToggle" type="button" aria-label="Open navigation" aria-controls="sidenav" aria-expanded="false">☰</button>
+    <a class="brand" href="#/dashboard" style="color:inherit;text-decoration:none"><span class="logo">PR</span><span class="name">PR Review Runner</span></a>
+    <span class="crumb" id="crumb"><span class="sep">/</span><b id="crumbTitle">Dashboard</b></span>
+    <span class="grow"></span>
+    <div class="status-group" aria-label="Integrations">
+      <span class="badge badge-outline" id="slackBadge" data-tip="">Slack: …</span>
+      <span class="badge badge-outline" id="jiraBadge" data-tip="">Jira: …</span>
+    </div>
+    <a class="btn btn-sm hidden" id="newReviewBtn" href="#/review">+ New review</a>
+    <button class="btn btn-ghost btn-sm btn-icon" id="themeBtn" type="button" aria-label="Toggle dark mode" title="Toggle dark mode">◐</button>
+    <details class="usermenu hidden" id="userChip">
+      <summary aria-label="Account menu"><span class="avatar" id="userAvatar">?</span><span class="who" id="userName"></span><span class="badge badge-secondary" id="userRole"></span></summary>
+      <div class="menu" role="menu">
+        <div class="menu-head"><b id="menuName"></b><div class="muted" id="menuEmail"></div></div>
+        <a href="#/account" role="menuitem">My access &amp; roles</a>
+        <a href="#/settings/users" role="menuitem" class="admin-only hidden">Users &amp; roles</a>
+        <button type="button" role="menuitem" id="menuTheme">Toggle dark mode</button>
+        <a href="/logout" role="menuitem" id="logoutBtn">Log out</a>
+      </div>
+    </details>
+  </div>
+</header>
+<div class="scrim" id="scrim"></div>
+
+<div class="shell">
+  <aside class="sidenav" id="sidenav" aria-label="Main navigation">
+    <div class="nav-group">Overview</div>
+    <a class="nav-link" href="#/dashboard" data-nav="dashboard"><svg viewBox="0 0 24 24"><rect x="3" y="3" width="7" height="9" rx="1"/><rect x="14" y="3" width="7" height="5" rx="1"/><rect x="14" y="12" width="7" height="9" rx="1"/><rect x="3" y="16" width="7" height="5" rx="1"/></svg>Dashboard</a>
+    <a class="nav-link" href="#/reports" data-nav="reports"><svg viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><path d="M14 2v6h6M8 13h8M8 17h5"/></svg>Reports &amp; issues</a>
+    <div class="nav-group run-only">Reviews</div>
+    <a class="nav-link run-only" href="#/review" data-nav="review"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M12 8v8M8 12h8"/></svg>New review</a>
+    <a class="nav-link run-only" href="#/listen" data-nav="listen"><svg viewBox="0 0 24 24"><path d="M2 12h3l3-8 4 16 3-8h7"/></svg>Listen to a PR</a>
+    <a class="nav-link run-only" href="#/jobs" data-nav="jobs"><svg viewBox="0 0 24 24"><path d="M8 6h13M8 12h13M8 18h13M3 6h.01M3 12h.01M3 18h.01"/></svg>Jobs &amp; progress<span class="count hidden" id="navJobs"></span></a>
+    <div class="nav-group admin-only hidden">Administration</div>
+    <a class="nav-link admin-only hidden" href="#/settings/repos" data-nav="settings/repos"><svg viewBox="0 0 24 24"><path d="M3 7a2 2 0 0 1 2-2h4l2 2h8a2 2 0 0 1 2 2v8a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/></svg>Repositories</a>
+    <a class="nav-link admin-only hidden" href="#/settings/slack" data-nav="settings/slack"><svg viewBox="0 0 24 24"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>Slack sharing</a>
+    <a class="nav-link admin-only hidden" href="#/settings/users" data-nav="settings/users"><svg viewBox="0 0 24 24"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87M16 3.13a4 4 0 0 1 0 7.75"/></svg>Users &amp; roles</a>
+    <div class="nav-group">Account</div>
+    <a class="nav-link" href="#/account" data-nav="account"><svg viewBox="0 0 24 24"><circle cx="12" cy="8" r="4"/><path d="M4 21v-1a6 6 0 0 1 6-6h4a6 6 0 0 1 6 6v1"/></svg>My access</a>
+    <a class="nav-link" href="/logout"><svg viewBox="0 0 24 24"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4M16 17l5-5-5-5M21 12H9"/></svg>Log out</a>
+    <div class="nav-foot"><div class="row"><span class="badge badge-outline">🔒 Keycloak</span><span id="navWho" class="break"></span></div></div>
+  </aside>
+
+  <main class="content" id="main">
+    <div class="alert alert-warning hidden" id="slackAlert" role="status" style="margin-bottom:1rem">
+      <span class="icon">⚠️</span>
+      <div class="grow"><div class="alert-title" id="slackAlertTitle">The HTML report can't be attached in Slack</div>
+        <div class="alert-description" id="slackAlertText"></div></div>
+      <button class="btn btn-outline btn-sm" id="slackRecheck" type="button">Check again</button>
+    </div>
+    <div class="alert alert-warning hidden" id="accessAlert" role="status" style="margin-bottom:1rem">
+      <span class="icon">🔒</span>
+      <div class="grow"><div class="alert-title" id="accessTitle"></div><div class="alert-description" id="accessText"></div></div>
+    </div>
+
+    <!-- ================= Dashboard ================= -->
+    <section class="view" id="view-dashboard" aria-labelledby="dashTitle">
+      <div class="page-head">
+        <div><h1 id="dashTitle">Dashboard</h1><p class="muted" id="dashScope">Overview of your reviews.</p></div>
+        <div class="actions">
+          <select class="select" id="dashDays" aria-label="Time range" style="width:auto">
+            <option value="7">Last 7 days</option><option value="14" selected>Last 14 days</option><option value="30">Last 30 days</option><option value="90">Last 90 days</option></select>
+          <button class="btn btn-outline btn-sm" id="dashRefresh" type="button">Refresh</button>
+        </div>
+      </div>
+      <div class="tiles" id="dashTiles"><div class="tile skeleton" style="height:88px"></div><div class="tile skeleton"></div><div class="tile skeleton"></div><div class="tile skeleton"></div><div class="tile skeleton"></div><div class="tile skeleton"></div></div>
+      <div class="dash-grid">
+        <div class="card w4"><div class="card-header"><div class="card-title">Open issues by severity</div><div class="card-description">All reports you can see</div></div>
+          <div class="card-content" id="dashSev"></div></div>
+        <div class="card w8"><div class="card-header row"><div class="grow"><div class="card-title">Issues found per day</div><div class="card-description" id="dailyDesc">By report date</div></div></div>
+          <div class="card-content" id="dashDaily"></div></div>
+        <div class="card w8"><div class="card-header row"><div class="grow"><div class="card-title">Recent reports</div></div><a class="btn btn-ghost btn-sm" href="#/reports">All reports →</a></div>
+          <div class="card-content" id="dashRecent"></div></div>
+        <div class="card w4"><div class="card-header"><div class="card-title">Quick actions</div></div>
+          <div class="card-content"><div class="quick" id="dashQuick"></div></div></div>
+        <div class="card w4"><div class="card-header"><div class="card-title">Repositories</div><div class="card-description">Most open issues first</div></div>
+          <div class="card-content" id="dashRepos"></div></div>
+        <div class="card w4"><div class="card-header"><div class="card-title">Who should fix the most</div><div class="card-description">Original authors · issues without a Jira ticket</div></div>
+          <div class="card-content" id="dashAuthors"></div></div>
+        <div class="card w4"><div class="card-header"><div class="card-title">Top categories</div></div>
+          <div class="card-content" id="dashCats"></div></div>
+        <div class="card w8"><div class="card-header row"><div class="grow"><div class="card-title">Running jobs</div></div><a class="btn btn-ghost btn-sm run-only" href="#/jobs">Jobs →</a></div>
+          <div class="card-content" id="dashJobs"></div></div>
+        <div class="card w4"><div class="card-header"><div class="card-title">System status</div></div>
+          <div class="card-content"><div class="sys" id="dashSystem"></div></div></div>
+      </div>
+    </section>
+
+    <!-- ================= New review + Listen ================= -->
+    <section class="view" id="view-review">
+      <div class="page-head"><div><h1>New review</h1>
+        <p class="muted">Changes the commit email on GitHub, opens the PR, collects the bot's review into a report, sends it to Slack and creates Jira tickets.</p></div></div>
+      <div class="layout">
+        <section class="col">
+          <div class="card">
+            <div class="card-header"><div class="card-title">Repository &amp; branch</div>
+              <div class="card-description">Values are prefilled from Settings and .env. Repositories and branches load from GitHub.</div></div>
+            <div class="card-content">
+              <div class="grid-2">
+                <div class="field"><label class="label" for="owner">GitHub owner / org</label><input class="input" id="owner" type="text"></div>
+                <div class="field"><label class="label" for="repo">Repository</label><input class="input" id="repo" type="text" list="repos" placeholder="loading…"></div>
+              </div>
+              <div class="repo-info" id="repoInfo"></div>
+              <datalist id="repos"></datalist><datalist id="branches"></datalist>
+              <div class="grid-2">
+                <div class="field"><label class="label" for="branch">Branch</label><input class="input" id="branch" type="text" list="branches"></div>
+                <div class="field"><label class="label" for="dev">Base (dev) branch</label><input class="input" id="dev" type="text" list="branches"></div>
+              </div>
+              <div class="field"><label class="label" for="email">New commit email</label><input class="input" id="email" type="email"></div>
+              <div class="field"><label class="label" for="title">PR title</label><input class="input" id="title" type="text" placeholder="Email update: <new branch>"></div>
+              <div class="share-line" id="shareLine"><span class="muted">Slack:</span> <span id="shareText">…</span>
+                <span class="grow"></span><button class="btn btn-ghost btn-xs admin-only hidden" type="button" data-settings="slack">Change in Settings</button></div>
+              <label class="switch" style="margin-top:1rem"><input id="listen" type="checkbox" checked><span></span>Wait for the review and send it to Slack</label>
+              <details class="accordion flat" style="margin-top:.75rem">
+                <summary>Review &amp; Slack settings</summary>
+                <div class="accordion-content">
+                  <div class="grid-2">
+                    <div class="field"><label class="label" for="bot">Review bot login (regex)</label><input class="input" id="bot" type="text"></div>
+                    <div class="field"><label class="label" for="poll">Check every (s)</label><input class="input" id="poll" type="number" min="5"></div>
+                  </div>
+                  <div class="grid-3">
+                    <div class="field"><label class="label" for="settle">Settle (s)</label><input class="input" id="settle" type="number" min="0"></div>
+                    <div class="field"><label class="label" for="quiet_minutes">Quiet (min)</label><input class="input" id="quiet_minutes" type="number" min="1"></div>
+                    <div class="field"><label class="label" for="stuck_minutes">Stuck (min)</label><input class="input" id="stuck_minutes" type="number" min="1"></div>
+                  </div>
+                  <div class="field"><label class="label" for="timeout">Give up after (min, 0 = never)</label><input class="input" id="timeout" type="number" min="0"></div>
+                  <div class="field"><label class="label" for="webhook">Slack webhook (optional override)</label><input class="input" id="webhook" type="password" autocomplete="off">
+                    <div class="hint" id="slackHint"></div></div>
+                  <label class="check"><input id="keep_watching" type="checkbox"> Keep listening after the review finishes</label>
+                  <label class="check"><input id="include_existing" type="checkbox"> Also include bot comments already on the PR</label>
+                </div>
+              </details>
+            </div>
+            <div class="card-footer">
+              <button class="btn btn-outline" id="previewBtn" type="button">Preview commits</button>
+              <button class="btn" id="runBtn" type="button">Run</button>
+            </div>
+            <div class="card-content" style="padding-top:0"><div class="alert alert-destructive hidden" id="formMsg" role="alert"></div></div>
+          </div>
+        </section>
+        <section class="col">
+          <div class="card" id="listenCard">
+            <div class="card-header"><div class="card-title">Listen to an existing PR</div>
+              <div class="card-description">Builds the report of a PR that already exists and sends it to Slack. Uses the owner, repository and review settings on the left.</div></div>
+            <div class="card-content row" style="align-items:flex-end">
+              <div class="field grow"><label class="label" for="prnum">PR number</label><input class="input" id="prnum" type="number" min="1"></div>
+              <button class="btn btn-secondary" id="listenBtn" type="button">Listen</button>
+            </div>
+          </div>
+          <div class="card hidden" id="previewCard">
+            <div class="card-header"><div class="card-title" id="previewTitle">Preview</div></div>
+            <div class="card-content" id="previewBody"></div>
+          </div>
+          <div class="card"><div class="card-header"><div class="card-title">What happens</div></div>
+            <div class="card-content text-sm"><ol style="margin:0;padding-left:1.1rem;display:flex;flex-direction:column;gap:.35rem">
+              <li><b>Read commits</b> in your branch that are not in the base branch.</li>
+              <li><b>Rewrite the email</b> on GitHub and create two new branches. Your branches are never changed.</li>
+              <li><b>Create the PR</b> (or reuse an existing one).</li>
+              <li><b>Review report to Slack</b> when the bot has finished. Follow it under <a href="#/jobs">Jobs &amp; progress</a>.</li></ol></div></div>
+        </section>
+      </div>
+    </section>
+
+    <!-- ================= Jobs & progress ================= -->
+    <section class="view" id="view-jobs">
+      <div class="page-head"><div><h1>Jobs &amp; progress</h1><p class="muted">Every review and listen started since the portal was last restarted.</p></div>
+        <div class="actions"><a class="btn btn-sm" href="#/review">+ New review</a></div></div>
+      <div class="layout">
+        <section class="col"><div class="card">
+          <div class="card-header"><div class="card-title">Jobs</div></div>
+          <div class="card-content"><div class="jobs" id="jobs"><span class="muted text-sm">No jobs yet.</span></div></div></div></section>
+        <section class="col"><div class="card">
+          <div class="card-header row"><div class="card-title grow" id="jobTitle">Progress</div>
+            <span id="prLink" class="text-sm"></span>
+            <a class="btn btn-ghost btn-sm hidden" id="jobReportLink" href="#/reports">Open report</a>
+            <button class="btn btn-outline btn-sm" id="stopBtn" type="button" disabled>Stop</button></div>
+          <div class="card-content">
+            <div class="steps" id="steps"></div>
+            <details class="accordion" id="logBox" style="margin-top:1rem" open><summary>Log</summary>
+              <div class="accordion-content"><div class="log" id="log"><span class="muted">Start a run or pick a job to see its log here.</span></div></div></details>
+          </div></div></section>
+      </div>
+    </section>
+
+    <!-- ================= Reports & issues ================= -->
+    <section class="view" id="view-reports">
+      <div class="page-head"><div><h1>Reports &amp; issues</h1><p class="muted">Every problem the review bot reported, with the original author. Click a row for the AI prompt and the code.</p></div></div>
+      <div class="card" id="issuesCard">
+        <div class="card-content" style="padding-top:1.25rem">
+          <div class="rep-bar">
+            <select class="select" id="reportSel" aria-label="Report"><option value="">No reports yet</option></select>
+            <button class="btn btn-outline btn-sm" id="refreshBtn" type="button">Refresh</button>
+            <a class="btn btn-outline btn-sm hidden" id="htmlLink" target="_blank" rel="noopener">Open HTML report ↗</a>
+            <a class="btn btn-ghost btn-sm hidden" id="dlLink">Download</a>
+            <button class="btn btn-sm hidden" id="resendBtn" type="button" title="Uses the Slack sharing from Settings">Resend to Slack</button>
+            <button class="btn btn-ghost btn-sm hidden" id="deleteReportBtn" type="button" title="Admins only">Delete</button>
+          </div>
+          <div class="delivery muted" id="slackInfo" style="margin-top:.75rem"></div>
+          <div class="filters">
+            <div class="tabs-list" id="counts" role="group" aria-label="Filter by severity"></div>
+            <input class="input" id="q" type="search" placeholder="Search file, text, category, author…" aria-label="Search issues">
+          </div>
+          <div id="issuesWrap"><div class="empty"><span class="big">📋</span>Run a review (or pick a saved report) to see its issues here.</div></div>
+          <div class="hint" id="jiraHint" style="margin-top:.75rem"></div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ================= Settings: repositories ================= -->
+    <section class="view" id="view-settings-repos">
+      <div class="page-head"><div><h1>Repositories</h1><p class="muted">Saved in the database and used by the portal, run.py and the Slack bot. Empty fields use .env.</p></div>
+        <div class="actions"><button class="btn btn-sm" id="mapAddBtn" type="button">+ Add repository</button></div></div>
+      <div class="card"><div class="card-content" style="padding-top:1.25rem">
+        <div id="tab-repos" class="set-section">
+          <p class="muted text-sm">Map each repository to its Jira project key and its own defaults. Choosing the repository on <a href="#/review">New review</a> fills these in.</p>
+          <div id="mapList" style="margin-top:.75rem"></div>
+          <form class="map-form hidden" id="mapForm" autocomplete="off">
+            <div class="card-title" style="font-size:.875rem" id="mapFormTitle">Add repository</div>
+            <div class="grid-2">
+              <div class="field"><label class="label" for="m_owner">GitHub owner / org</label><input class="input" id="m_owner" type="text" required></div>
+              <div class="field"><label class="label" for="m_repo">Repository</label><input class="input" id="m_repo" type="text" list="repos" required></div>
+            </div>
+            <div class="grid-3">
+              <div class="field"><label class="label" for="m_jira_project">Jira project key</label><input class="input mono" id="m_jira_project" type="text" maxlength="20" style="text-transform:uppercase"></div>
+              <div class="field"><label class="label" for="m_jira_issue_type">Jira issue type</label><input class="input" id="m_jira_issue_type" type="text"></div>
+              <div class="field"><label class="label" for="m_jira_labels">Jira labels</label><input class="input" id="m_jira_labels" type="text"></div>
+            </div>
+            <div class="grid-3">
+              <div class="field"><label class="label" for="m_dev">Base (dev) branch</label><input class="input" id="m_dev" type="text"></div>
+              <div class="field"><label class="label" for="m_email">New commit email</label><input class="input" id="m_email" type="email"></div>
+              <div class="field"><label class="label" for="m_slack_channel">Slack channel ID</label><input class="input mono" id="m_slack_channel" type="text"></div>
+            </div>
+            <div class="grid-2">
+              <div class="field"><label class="label" for="m_bot">Review bot login (regex)</label><input class="input" id="m_bot" type="text"></div>
+              <div class="field"><span class="label">&nbsp;</span><div class="hint">Placeholders show the .env value used when a field is left empty.</div></div>
+            </div>
+            <div class="alert alert-destructive hidden" id="mapMsg" role="alert" style="margin-top:.75rem"></div>
+            <div class="row" style="justify-content:flex-end;margin-top:.75rem">
+              <button class="btn btn-ghost btn-sm" id="mapCancel" type="button">Cancel</button>
+              <button class="btn btn-sm" id="mapSave" type="submit">Save</button></div>
+          </form>
+        </div>
+      </div></div>
+    </section>
+
+    <!-- ================= Settings: Slack ================= -->
+    <section class="view" id="view-settings-slack">
+      <div class="page-head"><div><h1>Slack sharing</h1><p class="muted">How finished review reports are shared in Slack (new reviews, Listen and Resend).</p></div></div>
+      <div class="card"><div class="card-content" style="padding-top:1.25rem">
+        <div id="tab-slack" class="set-section">
+          <div class="field fmt-wrap">
+            <span class="label">Slack output</span>
+            <div class="tabs-list" role="radiogroup" aria-label="Slack output">
+              <input type="radio" name="fmt" id="fmtHtml" value="html"><label class="tabs-trigger" for="fmtHtml">HTML report · 1 message</label>
+              <input type="radio" name="fmt" id="fmtMsg" value="messages"><label class="tabs-trigger" for="fmtMsg">Normal messages</label>
+            </div>
+            <div class="hint" id="fmtHint"></div>
+          </div>
+          <div class="field" id="attachBox">
+            <span class="label">Share the report in Slack as <span class="muted" style="font-weight:400">(pick one or more)</span></span>
+            <div class="opts" role="group" aria-label="Share the report in Slack as">
+              <label class="opt"><input type="checkbox" name="attach" value="html">
+                <span><b>HTML file <span class="badge badge-secondary">default</span></b>
+                <span class="d">The interactive report with tabs, search, severity filter and Copy buttons. Slack cannot show HTML itself, so people download it and open it in a browser.</span></span></label>
+              <label class="opt"><input type="checkbox" name="attach" value="canvas">
+                <span><b>Slack canvas</b>
+                <span class="d">A Slack document that opens right inside Slack, on desktop and phone. Shows every issue, who should fix it and the AI prompts in code blocks. Simple styling (headings, lists, links). Needs the <code>canvases:write</code> scope. <b>Free Slack plan:</b> the report goes into the channel's <em>Canvas</em> tab and replaces the previous report; older ones stay in the portal and are listed under "Earlier reviews".</span></span></label>
+              <label class="opt"><input type="checkbox" name="attach" value="pdf">
+                <span><b>PDF</b>
+                <span class="d">The styled report as a PDF. Slack shows it in its built-in viewer, no download needed. Everything is expanded, good for reading and sharing; links work, but there is no search or filter. Needs Chrome on this machine.</span></span></label>
+            </div>
+            <div class="hint" id="attachHint"></div>
+          </div>
+          <div class="alert alert-destructive hidden" id="slackSetMsg" role="alert" style="margin-top:.75rem"></div>
+          <div class="row" style="justify-content:flex-end;margin-top:1rem">
+            <button class="btn btn-ghost btn-sm" id="slackReset" type="button">Reset to HTML file</button>
+            <button class="btn btn-sm" id="slackSave" type="button">Save Slack sharing</button></div>
+        </div>
+      </div></div>
+    </section>
+
+    <!-- ================= Settings: users & roles ================= -->
+    <section class="view" id="view-settings-users">
+      <div class="page-head"><div><h1>Users &amp; roles</h1>
+        <p class="muted" id="usersIntro">Give people a role (including <b>admin</b>) and choose which repositories they can review. Roles from Keycloak always count too.</p></div>
+        <div class="actions"><button class="btn btn-sm" id="userAddBtn" type="button">+ Add user</button></div></div>
+      <div class="card"><div class="card-content" style="padding-top:1.25rem">
+        <div id="tab-users" class="set-section">
+          <div id="rolesInfo" class="hint"></div>
+          <form class="map-form hidden" id="userForm" autocomplete="off">
+            <div class="card-title" style="font-size:.875rem" id="userFormTitle">Add user</div>
+            <div class="grid-2" style="margin-top:.75rem">
+              <div class="field"><label class="label" for="u_username">Keycloak username or email</label>
+                <input class="input" id="u_username" type="text" required>
+                <div class="hint">You can add people before their first login. An email is linked to their account when they first log in.</div></div>
+              <div class="field"><label class="label" for="u_role">Portal role</label>
+                <select class="select" id="u_role"><option value="">None (Keycloak roles only)</option><option value="admin">Admin</option><option value="reviewer">Reviewer</option><option value="viewer">Viewer</option></select>
+                <div class="hint">Admin: everything, including this page. Applies at their next page load.</div></div>
+            </div>
+            <div class="field"><label class="label" for="u_repos">Repositories</label>
+              <textarea class="input mono" id="u_repos" rows="4" placeholder="Bizionic-Tech/earnon&#10;Bizionic-Tech/*" style="height:auto"></textarea>
+              <div class="hint">One per line: <code>owner/repo</code>, or <code>owner/*</code> for every repository of that owner. Admins can use every repository.</div></div>
+            <div class="alert alert-destructive hidden" id="userMsg" role="alert" style="margin-top:.75rem"></div>
+            <div class="row" style="justify-content:flex-end;margin-top:.75rem">
+              <button class="btn btn-ghost btn-sm" id="userCancel" type="button">Cancel</button>
+              <button class="btn btn-sm" id="userSave" type="submit">Save</button></div>
+          </form>
+          <div id="userList" style="margin-top:.75rem"></div>
+        </div>
+      </div></div>
+    </section>
+
+    <!-- ================= My access ================= -->
+    <section class="view" id="view-account">
+      <div class="page-head"><div><h1>My access</h1><p class="muted">Who you are logged in as, your roles and what you can do.</p></div>
+        <div class="actions"><a class="btn btn-outline btn-sm" href="/logout">Log out</a></div></div>
+      <div class="acc-grid">
+        <div class="card"><div class="card-header"><div class="card-title">Account</div></div><div class="card-content"><table class="kv" id="accKv"></table></div></div>
+        <div class="card"><div class="card-header"><div class="card-title">Repositories</div><div class="card-description">Where you can start reviews</div></div><div class="card-content" id="accRepos"></div></div>
+        <div class="card" style="grid-column:1/-1"><div class="card-header"><div class="card-title">Permissions</div></div><div class="card-content" id="accPerms"></div></div>
+      </div>
+    </section>
+  </main>
+</div>
+<div class="toast" id="toast" role="status" aria-live="polite"></div>
+<script>
+const $ = id => document.getElementById(id);
+const esc = s => String(s ?? "").replace(/[&<>"']/g, c => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
+const safeUrl = u => /^https?:\/\//i.test(u || "") ? esc(u) : "";
+const SEV = ["Critical","Major","Medium","Minor","Info"];
+const sevBadge = s => `<span class="badge sev sev-${esc(String(s || "Info").toLowerCase())}"><span class="dot"></span>${esc(s || "Info")}</span>`;
+const show = (el, on) => el.classList.toggle("hidden", !on);
+let STEPS = [], current = null, source = null, JIRA = {configured:false, missing:[]};
+let REPORT = null, sevFilter = "all", open = new Set(), jiraState = {}, reloadTimer = null, toastTimer = null;
+let SLACK = {format: "html", attach: ["html"]}, SETTINGS = {repos: [], env: {}}, REPO_JIRA = null, OPTS = {};
+let ME = {permissions: []}, EPICS = {}, USERS = {users: []};
+const can = p => (ME.permissions || []).includes(p);
+
+async function api(path, data) {
+  const r = await fetch(path, data === undefined ? {} :
+    {method: "POST", headers: {"Content-Type": "application/json"}, body: JSON.stringify(data)});
+  const j = await r.json().catch(() => ({error: "Bad response (" + r.status + ")"}));
+  if (r.status === 401 && j.login) { location.href = "/login"; throw new Error(j.error); }
+  if (!r.ok) throw new Error(j.error || r.statusText);
+  return j;
+}
+const store = {get(k, d) { try { const v = localStorage.getItem(k); return v === null ? d : JSON.parse(v); } catch (e) { return d; } },
+               set(k, v) { try { localStorage.setItem(k, JSON.stringify(v)); } catch (e) {} }};
+function toast(msg, isErr) {
+  const t = $("toast"); t.textContent = msg; t.className = "toast show" + (isErr ? " error" : "");
+  clearTimeout(toastTimer); toastTimer = setTimeout(() => t.className = "toast", 4500);
+}
+function showErr(msg) { const m = $("formMsg"); m.textContent = msg || ""; show(m, !!msg); }
+/* Slack sharing lives in Settings: these read the (unsaved) choices in the Settings dialog */
+function fmt() { return $("fmtMsg").checked ? "messages" : "html"; }
+function attach() { return [...document.querySelectorAll('input[name="attach"]:checked')].map(x => x.value); }
+function setAttach(list) { document.querySelectorAll('input[name="attach"]').forEach(x => x.checked = list.includes(x.value)); }
+const ATTACH_NAMES = {canvas: "Slack canvas", pdf: "PDF", html: "HTML file"};
+function attachHint() {
+  const a = attach();
+  show($("attachBox"), fmt() === "html");
+  $("attachHint").textContent = a.length
+    ? "One Slack message with the summary, " + a.map(x => ATTACH_NAMES[x]).join(" + ") + " and the portal link."
+    : "Nothing selected: Slack gets only the summary and the portal link.";
+}
+function shareText() {
+  $("shareText").innerHTML = SLACK.format === "messages" ? "<b>Normal messages</b> (one per review comment)"
+    : SLACK.attach.length ? "<b>" + esc(SLACK.attach.map(x => ATTACH_NAMES[x] || x).join(" + ")) + "</b> · 1 message"
+    : "<b>Summary + portal link</b> (nothing attached)";
+}
+function form() {
+  const ids = ["owner","repo","branch","dev","email","title","bot","poll","settle","quiet_minutes","stuck_minutes","timeout","webhook"];
+  const d = Object.fromEntries(ids.map(k => [k, $(k).value.trim()]));
+  ["listen","keep_watching","include_existing"].forEach(k => d[k] = $(k).checked);
+  return d;                                    // Slack format + attachments come from Settings (server side)
+}
+function remember() { store.set("prr", {owner:$("owner").value, repo:$("repo").value, dev:$("dev").value}); }
+
+/* ---------------- theme ---------------- */
+function applyTheme(t) { if (t) document.documentElement.setAttribute("data-theme", t); }
+applyTheme(store.get("theme", ""));
+$("themeBtn").onclick = () => {
+  const r = document.documentElement, cur = r.getAttribute("data-theme");
+  const dark = cur === "dark" || (!cur && matchMedia("(prefers-color-scheme: dark)").matches);
+  const t = dark ? "light" : "dark"; applyTheme(t); store.set("theme", t);
+};
+
+/* ---------------- GitHub lists ---------------- */
+async function loadRepos() {
+  const owner = $("owner").value.trim(); if (!owner) return;
+  $("repo").placeholder = "loading…";
+  try {
+    const j = await api("/api/repos?owner=" + encodeURIComponent(owner));
+    $("repos").innerHTML = j.repos.map(r => `<option value="${esc(r.name)}">`).join("");
+    $("repo").placeholder = j.repos.length + " repositories - type to search";
+  } catch (e) { $("repo").placeholder = "could not load"; showErr(e.message); }
+}
+let lastRepo = "";
+async function loadBranches() {
+  const owner = $("owner").value.trim(), repo = $("repo").value.trim();
+  if (!owner || !repo || repo === lastRepo) return;
+  lastRepo = repo; $("branches").innerHTML = "";
+  applyRepoSettings(owner, repo);
+  try {
+    const j = await api(`/api/branches?owner=${encodeURIComponent(owner)}&repo=${encodeURIComponent(repo)}`);
+    $("branches").innerHTML = j.branches.map(b => `<option value="${esc(b)}">`).join("");
+    showErr(""); remember();
+  } catch (e) { showErr(e.message); }
+}
+
+function fmtHint() {
+  $("fmtHint").textContent = fmt() === "html"
+    ? "One Slack message when the review finishes, with the report in the formats chosen below."
+    : "One Slack message per review comment as it arrives, plus a closing message with the report link.";
+}
+
+/* ---------------- Slack status ---------------- */
+async function checkSlack() {
+  const b = $("slackBadge");
+  b.textContent = "Slack: checking…"; b.className = "badge badge-outline";
+  try {
+    const c = SLACK_STATUS = await api(`/api/slack/check?owner=${encodeURIComponent($("owner").value.trim())}&repo=${encodeURIComponent($("repo").value.trim())}`);
+    b.textContent = c.ok ? "Slack: ready" : (c.webhook || c.token ? "Slack: summary only" : "Slack: off");
+    b.className = "badge " + (c.ok ? "badge-success" : c.webhook || c.token ? "badge-warning" : "badge-outline");
+    b.dataset.tip = c.hint || "";
+    show($("slackAlert"), !c.ok);
+    $("slackAlertTitle").textContent = c.webhook || c.token
+      ? "Slack can't get " + (c.attach || []).map(x => ATTACH_NAMES[x]).join(" / ") + " yet: it will get only the summary"
+      : "Slack is not configured";
+    $("slackAlertText").textContent = c.hint || "";
+    $("slackHint").textContent = c.hint || "";
+    renderSystem();
+  } catch (e) { b.textContent = "Slack: check failed"; b.className = "badge badge-warning"; b.dataset.tip = e.message; }
+}
+$("slackRecheck").onclick = checkSlack;
+
+async function init() {
+  const c = await api("/api/config").catch(e => { showErr(e.message); return null; });
+  if (!c) return;
+  STEPS = c.steps; renderSteps(STEPS.map(n => ({name:n, state:"wait", text:""})));
+  JIRA = c.jira || JIRA;
+  applyUser(c.user || {}, c.my_repos);
+  const saved = store.get("prr", {});
+  const d = c.defaults;
+  if (c.my_repos && c.my_repos.length && !saved.repo && !d.repo) {        // start on the user's first repository
+    const [o, r] = c.my_repos[0].split("/"); d.owner = o; if (r !== "*") d.repo = r;
+  }
+  $("owner").value = saved.owner || d.owner; $("repo").value = saved.repo || d.repo;
+  $("branch").value = d.branch; $("dev").value = saved.dev || d.dev; $("email").value = d.email;
+  OPTS = c.opts;
+  for (const k of ["bot","poll","settle","quiet_minutes","stuck_minutes","timeout"]) $(k).value = c.opts[k];
+  SLACK = {format: c.slack_format || "html", attach: c.slack_attach || ["html"]}; shareText();
+  jiraBadge(JIRA);
+  await loadRepos(); loadBranches(); loadJobs(); loadReports(store.get("report", ""));
+  if (!lastRepo) checkSlack();
+}
+
+/* ---------------- logged-in user, roles and access ---------------- */
+const ROLE_NAMES = {admin: "Admin", reviewer: "Reviewer", viewer: "Viewer"};
+function applyUser(u, myRepos) {
+  ME = u;
+  show($("userChip"), !!u.username);
+  $("userName").textContent = u.name || u.username || "";
+  $("userName").title = u.email || u.username || "";
+  $("userRole").textContent = (u.roles || []).map(r => ROLE_NAMES[r] || r).join(", ") || "no role";
+  $("userRole").className = "badge " + ((u.roles || []).length ? "badge-secondary" : "badge-destructive");
+  const initials = (u.name || u.username || "?").split(/[\s@._-]+/).filter(Boolean).slice(0, 2).map(x => x[0].toUpperCase()).join("");
+  $("userAvatar").textContent = initials || "?";
+  $("menuName").textContent = u.name || u.username || ""; $("menuEmail").textContent = u.email || u.username || "";
+  $("navWho").textContent = u.username || "";
+  document.querySelectorAll(".admin-only").forEach(e => show(e, can("settings:manage")));
+  document.querySelectorAll(".run-only").forEach(e => show(e, can("review:run")));
+  show($("newReviewBtn"), can("review:run"));
+  MY_REPOS = myRepos; if (ROUTED && currentPath() === "account") renderAccount();
+  const run = can("review:run");
+  ["previewBtn", "runBtn", "listenBtn"].forEach(id => { $(id).disabled = !run; $(id).title = run ? "" : "Your role can't start reviews."; });
+  let title = "", text = "";
+  if (!(u.roles || []).length) { title = "You don't have a role yet"; text = "Ask an admin to give your Keycloak account the reviewer or viewer role, then log out and in again."; }
+  else if (!run) { title = "Read-only access"; text = "You can open your own reports. Starting reviews needs the reviewer role."; }
+  else if (myRepos && !myRepos.length) { title = "No repositories assigned"; text = "Ask an admin to add repositories for you in Users & roles."; }
+  $("accessTitle").textContent = title; $("accessText").textContent = text; show($("accessAlert"), !!title);
+}
+
+/* ---------------- repository settings on the home page ---------------- */
+function jiraBadge(j) {
+  const jb = $("jiraBadge");
+  jb.textContent = j.configured ? `Jira: ${j.project}` : "Jira: off";
+  jb.className = "badge " + (j.configured ? "badge-success" : "badge-outline");
+  jb.dataset.tip = j.configured
+    ? `Tickets for this repository go to project ${j.project} (${j.type}) on ${j.base}` + (j.source === "repo" ? " (from Settings)." : " (from .env).")
+    : "Jira is not set up: " + (j.missing || []).join(", ") + ".";
+}
+let repoSeq = 0;
+async function applyRepoSettings(owner, repo) {
+  const seq = ++repoSeq;
+  try {
+    const e = await api(`/api/settings/repo?owner=${encodeURIComponent(owner)}&repo=${encodeURIComponent(repo)}`);
+    if (seq !== repoSeq) return;                   // the repository changed again meanwhile
+    REPO_JIRA = e.jira; jiraBadge(e.jira);
+    const m = e.mapping || {};
+    if (e.dev) $("dev").value = e.dev;
+    if (e.email) $("email").value = e.email;
+    $("bot").value = m.bot || OPTS.bot || "";
+    const bits = [];
+    if (e.mapped) {
+      bits.push('<span class="badge badge-success">Settings</span>');
+      bits.push(e.jira_project ? `Jira <b>${esc(e.jira_project)}</b>` : "no Jira project");
+      if (m.dev) bits.push(`base <code>${esc(m.dev)}</code>`);
+      if (m.slack_channel) bits.push(`Slack <code>${esc(m.slack_channel)}</code>`);
+      bits.push(`<button class="btn btn-link btn-xs" type="button" data-settings-repo="${esc(owner)}/${esc(repo)}">Edit</button>`);
+    } else {
+      bits.push('<span class="badge badge-outline">not mapped</span>');
+      bits.push(e.jira_project ? `using .env: Jira <b>${esc(e.jira_project)}</b>` : "no Jira project");
+      bits.push(`<button class="btn btn-link btn-xs" type="button" data-settings-repo="${esc(owner)}/${esc(repo)}">Map in Settings</button>`);
+    }
+    $("repoInfo").innerHTML = bits.join(" · ");
+    remember();
+  } catch (err) { if (seq === repoSeq) $("repoInfo").textContent = err.message; }
+  checkSlack();
+}
+document.addEventListener("click", ev => {
+  const b = ev.target.closest("[data-settings], [data-settings-repo]"); if (!b) return;
+  if (b.dataset.settingsRepo) { const [o, r] = b.dataset.settingsRepo.split("/"); openSettings("repos").then(() => editMapping(o, r)); }
+  else openSettings(b.dataset.settings);
+});
+
+/* ---------------- jobs ---------------- */
+const STATE_BADGE = {wait: "badge-outline", run: "badge-info", done: "badge-success", fail: "badge-destructive", skip: "badge-secondary"};
+const STATE_TEXT = {wait: "waiting", run: "running", done: "done", fail: "failed", skip: "skipped"};
+function renderSteps(steps) {
+  $("steps").innerHTML = steps.map((s, i) =>
+    `<div class="step ${s.state}"><b>${i + 1}. ${esc(s.name)}</b><span class="badge ${STATE_BADGE[s.state] || "badge-outline"}">${s.state === "run" ? '<span class="spinner" style="width:.6rem;height:.6rem"></span>' : ""}${esc(STATE_TEXT[s.state] || s.state)}</span>${s.text ? `<span class="st">${esc(s.text)}</span>` : ""}</div>`).join("");
+}
+function addLog(item) {
+  const log = $("log"), atEnd = log.scrollHeight - log.scrollTop - log.clientHeight < 40;
+  if (log.firstElementChild && log.firstElementChild.classList.contains("muted")) log.innerHTML = "";
+  const div = document.createElement("div");
+  div.className = "l-" + item.level;
+  div.textContent = (item.t ? item.t + "  " : "") + (item.level === "slack" ? "[Slack] " : "") + item.msg;
+  log.appendChild(div);
+  if (atEnd) log.scrollTop = log.scrollHeight;
+}
+function setPr(result) {
+  $("prLink").innerHTML = result && safeUrl(result.pr_url) ? `<a href="${safeUrl(result.pr_url)}" target="_blank" rel="noopener">Open PR #${esc(result.pr_number)} ↗</a>` : "";
+}
+function openJob(job) {
+  if (source) source.close();
+  current = job; $("log").innerHTML = ""; setPr(job.result);
+  $("jobTitle").textContent = "Progress · " + job.label;
+  const steps = job.steps.map(s => ({...s}));
+  renderSteps(steps);
+  $("stopBtn").disabled = job.status !== "running";
+  jobReport(job.report_id);
+  if (job.report_id) selectReport(job.report_id);
+  source = new EventSource(`/api/jobs/${job.id}/stream`);
+  source.onmessage = ev => {
+    const it = JSON.parse(ev.data);
+    if (it.kind === "log") { addLog(it); if (it.level === "error") $("logBox").open = true; }
+    else if (it.kind === "step") { steps[it.i] = {...steps[it.i], state: it.state, text: it.text}; renderSteps(steps);
+      if (it.i === 2 && it.state === "done") setPr({pr_url: it.text, pr_number: it.text.split("/").pop()}); }
+    else if (it.kind === "report") { scheduleReload(it.id); jobReport(it.id); }
+    else if (it.kind === "end") { source.close(); $("stopBtn").disabled = true; setPr(it.result); loadJobs();
+      toast(it.status === "done" ? "Job finished." : "Job " + it.status + ".", it.status !== "done");
+      if (it.result && it.result.report_id) scheduleReload(it.result.report_id); }
+  };
+}
+const JOB_BADGE = {running: "badge-info", done: "badge-success", failed: "badge-destructive", stopped: "badge-warning"};
+async function loadJobs() {
+  const j = await api("/api/jobs").catch(() => null); if (!j) return;
+  updateJobCount(j.jobs);
+  $("jobs").innerHTML = j.jobs.length ? "" : '<span class="muted text-sm">No jobs yet.</span>';
+  for (const job of j.jobs) {
+    const b = document.createElement("button"); b.type = "button";
+    b.innerHTML = `<span class="break">#${job.id} ${esc(job.label)}<span class="muted text-xs" style="display:block">${esc(ago(new Date(job.started * 1000).toISOString()))}${can("report:read_all") && job.user ? " · " + esc(job.user) : ""}</span></span><span class="badge ${JOB_BADGE[job.status] || "badge-outline"}">${esc(job.status)}</span>`;
+    b.onclick = () => openJob(job);
+    $("jobs").appendChild(b);
+  }
+}
+async function start(path, data, btn) {
+  showErr(""); btn.disabled = true;
+  try { const job = await api(path, data); remember(); go("jobs"); openJob(job); loadJobs(); }
+  catch (e) { showErr(e.message); }
+  finally { btn.disabled = false; }
+}
+
+/* ---------------- reports & issues ---------------- */
+async function loadReports(select) {
+  const j = await api("/api/reports").catch(() => null); if (!j) return;
+  const sel = $("reportSel"), cur = select || sel.value;
+  sel.innerHTML = j.reports.length ? j.reports.map(r => {
+    const p = r.pr || {}, s = r.summary || {};
+    const by = can("report:read_all") ? " · " + ((r.created_by || {}).username || "run.py / Slack") : "";
+    return `<option value="${esc(r.id)}">${esc(p.repo)} #${esc(p.number)} · ${esc((r.created_at || "").slice(0,16).replace("T"," "))} · ${esc(s.total ?? 0)} issue(s) · ${esc(r.status)}${esc(by)}</option>`;
+  }).join("") : '<option value="">No reports yet</option>';
+  if (cur && j.reports.some(r => r.id === cur)) sel.value = cur;
+  if (sel.value) loadReport(sel.value);
+}
+function selectReport(id) {
+  if ($("reportSel").value !== id) { loadReports(id); } else { loadReport(id); }
+}
+function scheduleReload(id) {
+  clearTimeout(reloadTimer);
+  reloadTimer = setTimeout(() => selectReport(id), 800);
+}
+async function loadReport(id) {
+  if (!id) return;
+  try {
+    REPORT = await api("/api/reports/" + encodeURIComponent(id)); store.set("report", id);
+    const p = REPORT.pr || {};
+    JIRA = await api(`/api/jira/config?owner=${encodeURIComponent(p.owner || "")}&repo=${encodeURIComponent(p.repo || "")}`).catch(() => JIRA);
+    $("jiraHint").textContent = JIRA.configured
+      ? `Tickets for ${p.owner}/${p.repo} go to project ${JIRA.project} (${JIRA.type}) on ${JIRA.base}, assigned to the original author.`
+      : `Jira is not set up for ${p.owner}/${p.repo}: ` + (JIRA.missing || []).join(", ") + ".";
+    renderIssues();
+  }
+  catch (e) { REPORT = null; $("issuesWrap").innerHTML = `<div class="empty">${esc(e.message)}</div>`; }
+}
+
+function deliveryText(r) {
+  const sl = r.slack, hist = r.slack_history || [];
+  if (!sl) return r.status === "listening" ? "Review in progress… the report goes to Slack when it finishes." : "Not sent to Slack yet.";
+  const got = sl.formats || (sl.how === "file" ? ["html"] : []);
+  const how = got.length ? `<span class="badge badge-success">${esc(got.map(x => ATTACH_NAMES[x] || x).join(" + "))} + summary</span>`
+            : sl.delivered ? '<span class="badge badge-warning">summary + link only</span>' : '<span class="badge badge-destructive">not delivered</span>';
+  const cv = safeUrl(sl.canvas_url) ? ` · <a href="${safeUrl(sl.canvas_url)}" target="_blank" rel="noopener">open canvas ↗</a>` : "";
+  return `Slack: ${how} <span class="muted">${esc((sl.at || "").slice(0,16).replace("T"," "))}${hist.length > 1 ? ` · sent ${hist.length} times` : ""}</span>${cv}` +
+         (sl.error ? `<div class="hint">${esc(sl.error)}</div>` : "");
+}
+
+function renderIssues() {
+  const r = REPORT; if (!r) return;
+  const href = "/reports/" + encodeURIComponent(r.id) + ".html";
+  $("htmlLink").href = href; $("dlLink").href = href + "?download=1";
+  [$("htmlLink"), $("dlLink")].forEach(e => show(e, true));
+  show($("resendBtn"), can("slack:resend"));
+  show($("deleteReportBtn"), can("settings:manage"));
+  $("slackInfo").innerHTML = (r.pr ? `<b>${esc(r.pr.owner)}/${esc(r.pr.repo)} #${esc(r.pr.number)}</b> ${esc(r.pr.title || "")}<br>` : "") + deliveryText(r);
+  const by = (r.summary || {}).by_severity || {};
+  $("counts").innerHTML = `<button class="tabs-trigger" type="button" data-f="all" aria-selected="${sevFilter === "all"}">All <span class="count">${(r.summary || {}).total || 0}</span></button>` +
+    SEV.filter(s => by[s]).map(s => `<button class="tabs-trigger" type="button" data-f="${s}" aria-selected="${sevFilter === s}">${s} <span class="count">${by[s]}</span></button>`).join("");
+  document.querySelectorAll("#counts [data-f]").forEach(b => b.onclick = () => { sevFilter = b.dataset.f; renderIssues(); });
+
+  const q = $("q").value.trim().toLowerCase();
+  const list = (r.issues || []).filter(it => (sevFilter === "all" || it.severity === sevFilter) &&
+    (!q || [it.path, it.suggestion, it.category, it.severity, (it.author || {}).email, (it.author || {}).name, (it.jira || {}).key].join(" ").toLowerCase().includes(q)));
+  if (!(r.issues || []).length) {
+    $("issuesWrap").innerHTML = `<div class="empty"><span class="big">${r.status === "listening" ? "⏳" : "🎉"}</span>${r.status === "listening" ? "Waiting for the review bot's comments…" : "No issues in this report."}</div>`;
+    return;
+  }
+  if (!list.length) { $("issuesWrap").innerHTML = '<div class="empty">No issues match the filter.</div>'; return; }
+  const rows = list.map((it, n) => {
+    const a = it.author || {};
+    const loc = it.path ? `<code>${esc(it.path)}${it.line ? ":" + esc(it.line) : ""}</code>${it.outdated ? ' <span class="badge badge-outline">outdated</span>' : ""}` : '<span class="muted">whole PR</span>';
+    const who = a.email ? `${esc(a.name || "")}<div class="muted text-xs">${esc(a.email)}</div>` : '<span class="muted">unknown</span>';
+    const isOpen = open.has(it.id);
+    const tr = `<tr class="clickable${it.removed ? " dim" : ""}${isOpen ? " expanded" : ""}" data-id="${esc(it.id)}" tabindex="0" aria-expanded="${isOpen}">
+      <td class="muted">${n + 1}</td><td>${sevBadge(it.severity)}</td>
+      <td class="break" style="max-width:300px">${loc}</td><td>${esc(it.category || "")}</td>
+      <td class="sugg">${esc(it.suggestion)}${it.removed ? ' <span class="badge badge-warning">removed</span>' : ""}</td>
+      <td>${who}</td><td class="jira">${jiraCell(it)}</td></tr>`;
+    if (!isOpen) return tr;
+    const diff = (it.diff_hunk || "").split("\n").slice(-30).map(l =>
+      `<span class="${l.startsWith("+") ? "add" : l.startsWith("-") ? "del" : l.startsWith("@@") ? "hdr" : ""}">${esc(l) || " "}</span>`).join("\n");
+    return tr + `<tr class="detail"><td></td><td colspan="6"><div class="detail-grid">
+      ${it.prompt ? `<div><h4>Prompt for AI agent <button class="btn btn-outline btn-xs" type="button" data-copy="${esc(it.id)}">Copy</button></h4><pre>${esc(it.prompt)}</pre></div>` : ""}
+      ${it.diff_hunk ? `<div><h4>Code being discussed</h4><pre class="diff">${diff}</pre></div>` : ""}
+      <div class="text-sm muted">${[it.occurrence ? "Happens: " + esc(it.occurrence) : "", a.source ? "Author from: " + esc({file:"last commit that changed this file","head-commit":"latest commit of the branch",none:"-"}[a.source] || a.source) : "",
+              safeUrl(it.url) ? `<a href="${safeUrl(it.url)}" target="_blank" rel="noopener">Open on GitHub ↗</a>` : ""].filter(Boolean).join(" · ")}</div>
+    </div></td></tr>`;
+  }).join("");
+  $("issuesWrap").innerHTML = `<div class="table-wrap"><table class="table"><thead><tr><th>#</th><th>Severity</th><th>File</th><th>Category</th><th>Issue</th><th>Original author</th><th class="right">Jira</th></tr></thead><tbody>${rows}</tbody></table></div>`;
+}
+
+function jiraCell(it) {
+  const st = jiraState[it.id] || {};
+  const j = it.jira || {};
+  if (j.key) return `<a class="btn btn-outline btn-xs" href="${safeUrl(j.url)}" target="_blank" rel="noopener">${esc(j.key)} ↗</a>` +
+    (j.warning ? ` <span class="badge badge-warning" data-tip="${esc(j.warning)}">⚠</span>` : "") +
+    `<div class="muted text-xs" style="margin-top:.25rem">${j.assignee ? esc(j.assignee) : "unassigned"}</div>`;
+  if (!can("jira:create")) return '<span class="muted text-xs">no ticket</span>';
+  if (!JIRA.configured) return `<span data-tip="Missing: ${esc((JIRA.missing || []).join(", "))}"><button class="btn btn-outline btn-xs" type="button" disabled>Create Jira</button></span>`;
+  if (st.busy) return '<button class="btn btn-outline btn-xs" type="button" disabled><span class="spinner"></span>Creating…</button>';
+  const trigger = `<button class="btn btn-outline btn-xs" type="button" data-open="${esc(it.id)}">${st.error ? "Retry" : "Create Jira"}</button>`;
+  if (!(st.editing || st.error)) return trigger;
+  const email = st.email ?? ((it.author || {}).email || "");
+  const ep = EPICS[REPORT.id] || {loading: true};
+  const epicOpts = ep.loading ? '<option value="">Loading epics…</option>'
+    : ep.error ? '<option value="">Could not load epics</option>'
+    : '<option value="">No epic</option>' + (ep.epics || []).map(e =>
+        `<option value="${esc(e.key)}"${st.epic === e.key ? " selected" : ""}>${esc(e.key)} · ${esc(e.summary)}${e.status ? " (" + esc(e.status) + ")" : ""}</option>`).join("");
+  const tdNote = ep.tech_debt_epic ? `label <code>${esc(ep.tech_debt_label)}</code>; goes under epic ${esc(ep.tech_debt_epic)} if no epic is chosen`
+    : `adds the label <code>${esc(ep.tech_debt_label || "technical-debt")}</code>`;
+  return `<div class="pop-anchor">${trigger}<div class="popover" role="dialog" aria-label="Create Jira ticket">
+    <div class="card-title" style="font-size:.875rem">Create Jira ticket</div>
+    <p class="muted text-xs" style="margin:.2rem 0 .75rem">Assigned to the original author. Change the email or clear it to leave the ticket unassigned.</p>
+    ${st.error ? `<div class="jerr">${esc(st.error)}</div>` : ""}
+    <label class="label text-xs" for="je-${esc(it.id)}">Assignee email</label>
+    <input class="input" id="je-${esc(it.id)}" type="email" data-email="${esc(it.id)}" value="${esc(email)}" placeholder="empty = unassigned"${st.error ? ' aria-invalid="true"' : ""}>
+    <label class="label text-xs" for="jp-${esc(it.id)}" style="margin-top:.6rem;display:block">Epic${ep.project ? " in " + esc(ep.project) : ""}</label>
+    <select class="select" id="jp-${esc(it.id)}" data-epic="${esc(it.id)}"${ep.loading ? " disabled" : ""}>${epicOpts}</select>
+    ${ep.error ? `<div class="jerr">${esc(ep.error)}</div>` : ""}
+    <label class="check"><input type="checkbox" data-tech="${esc(it.id)}"${st.tech ? " checked" : ""}> Add to Technical debt</label>
+    <div class="muted text-xs" style="margin-top:.15rem">${tdNote}</div>
+    <div class="row" style="justify-content:flex-end;margin-top:.75rem">
+      <button class="btn btn-ghost btn-sm" type="button" data-cancel="${esc(it.id)}">Cancel</button>
+      <button class="btn btn-sm" type="button" data-create="${esc(it.id)}">${st.error ? "Retry" : "Create ticket"}</button></div>
+  </div></div>`;
+}
+
+async function createJira(id) {
+  const input = document.querySelector(`input[data-email="${CSS.escape(id)}"]`);
+  const email = input ? input.value.trim() : "";
+  if (email && !/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(email)) { jiraState[id] = {...jiraState[id], error: "Enter a valid email or leave it empty.", email}; renderIssues(); return; }
+  const epicSel = document.querySelector(`select[data-epic="${CSS.escape(id)}"]`);
+  const techBox = document.querySelector(`input[data-tech="${CSS.escape(id)}"]`);
+  const epic = epicSel ? epicSel.value : (jiraState[id] || {}).epic || "", tech = techBox ? techBox.checked : !!(jiraState[id] || {}).tech;
+  jiraState[id] = {busy: true, email, epic, tech}; renderIssues();
+  try {
+    const res = await api(`/api/reports/${encodeURIComponent(REPORT.id)}/issues/${encodeURIComponent(id)}/jira`, {assignee_email: email, epic, tech_debt: tech});
+    const it = REPORT.issues.find(x => x.id === id); if (it) it.jira = res;
+    delete jiraState[id];
+    toast(`${res.existed ? "Ticket already existed" : "Created"}: ${res.key}` + (res.warning ? ` (${res.warning})` : ""));
+  } catch (e) { jiraState[id] = {error: e.message, email, epic, tech}; }
+  renderIssues();
+}
+async function loadEpics(rid) {
+  if (EPICS[rid] && !EPICS[rid].error) return;
+  EPICS[rid] = {loading: true};
+  try { EPICS[rid] = await api(`/api/reports/${encodeURIComponent(rid)}/jira/epics`); }
+  catch (e) { EPICS[rid] = {error: e.message, epics: []}; }
+  if (REPORT && REPORT.id === rid) renderIssues();
+}
+
+function toggleRow(tr) { const id = tr.dataset.id; open.has(id) ? open.delete(id) : open.add(id); renderIssues(); }
+$("issuesWrap").addEventListener("click", ev => {
+  if (ev.target.closest(".popover") && !ev.target.closest("button")) { ev.stopPropagation(); return; }
+  const t = ev.target.closest("button, a, input, select");
+  if (t) {
+    ev.stopPropagation();
+    if (t.dataset.open) { jiraState[t.dataset.open] = {...(jiraState[t.dataset.open] || {}), editing: true}; loadEpics(REPORT.id); renderIssues(); document.querySelector(`input[data-email="${CSS.escape(t.dataset.open)}"]`)?.focus(); }
+    else if (t.dataset.cancel) { delete jiraState[t.dataset.cancel]; renderIssues(); }
+    else if (t.dataset.create) createJira(t.dataset.create);
+    else if (t.dataset.copy) {
+      const it = REPORT.issues.find(x => x.id === t.dataset.copy);
+      const done = () => { t.textContent = "Copied ✓"; setTimeout(() => t.textContent = "Copy", 1500); };
+      const fallback = () => { const ta = document.createElement("textarea"); ta.value = it.prompt; document.body.appendChild(ta); ta.select(); try { document.execCommand("copy"); done(); } catch (e) {} ta.remove(); };
+      if (navigator.clipboard && window.isSecureContext) navigator.clipboard.writeText(it.prompt).then(done, fallback); else fallback();
+    }
+    return;
+  }
+  const tr = ev.target.closest("tr.clickable"); if (tr) toggleRow(tr);
+});
+$("issuesWrap").addEventListener("keydown", ev => {
+  if (ev.key === "Enter" && ev.target.dataset && ev.target.dataset.email) createJira(ev.target.dataset.email);
+  else if (ev.key === "Escape" && ev.target.dataset && ev.target.dataset.email) { delete jiraState[ev.target.dataset.email]; renderIssues(); }
+  else if ((ev.key === "Enter" || ev.key === " ") && ev.target.matches("tr.clickable")) { ev.preventDefault(); toggleRow(ev.target); }
+});
+$("issuesWrap").addEventListener("input", ev => {
+  if (ev.target.dataset && ev.target.dataset.email) jiraState[ev.target.dataset.email] = {...jiraState[ev.target.dataset.email], editing: true, email: ev.target.value};
+});
+$("issuesWrap").addEventListener("change", ev => {
+  const d = ev.target.dataset || {};
+  if (d.epic) jiraState[d.epic] = {...jiraState[d.epic], editing: true, epic: ev.target.value};
+  if (d.tech) jiraState[d.tech] = {...jiraState[d.tech], editing: true, tech: ev.target.checked};
+});
+$("q").addEventListener("input", renderIssues);
+$("reportSel").addEventListener("change", () => { open.clear(); jiraState = {}; sevFilter = "all"; loadReport($("reportSel").value); });
+$("refreshBtn").onclick = () => loadReports();
+$("resendBtn").onclick = async () => {
+  if (!REPORT) return; const b = $("resendBtn"); b.disabled = true; b.innerHTML = '<span class="spinner"></span>Sending…';
+  try { const r = await api(`/api/reports/${encodeURIComponent(REPORT.id)}/resend`, {webhook: $("webhook").value.trim()});
+        const got = (r.formats || []).map(x => ATTACH_NAMES[x]).join(" + ");
+        toast(!r.delivered ? "Not sent: " + (r.error || "") : (got ? "Sent to Slack with " + got + "." : "Sent to Slack as summary + link.") + (r.error ? " " + r.error : ""), !r.delivered || !!r.error);
+        await loadReport(REPORT.id); }
+  catch (e) { toast(e.message, true); }
+  b.textContent = "Resend to Slack"; b.disabled = false;
+};
+
+/* ---------------- form ---------------- */
+document.querySelectorAll('input[name="fmt"]').forEach(r => r.addEventListener("change", () => { fmtHint(); attachHint(); }));
+document.querySelectorAll('input[name="attach"]').forEach(r => r.addEventListener("change", attachHint));
+$("owner").addEventListener("change", () => { lastRepo = ""; loadRepos(); loadBranches(); });
+$("repo").addEventListener("change", loadBranches);
+$("repo").addEventListener("blur", loadBranches);
+$("runBtn").onclick = () => start("/api/run", form(), $("runBtn"));
+$("listenBtn").onclick = () => start("/api/listen", {...form(), pr: $("prnum").value}, $("listenBtn"));
+$("stopBtn").onclick = () => current && api(`/api/jobs/${current.id}/stop`, {}).then(() => toast("Stopping…")).catch(e => showErr(e.message));
+$("previewBtn").onclick = async () => {
+  showErr(""); const btn = $("previewBtn"); btn.disabled = true; btn.innerHTML = '<span class="spinner"></span>Reading…';
+  try {
+    const p = await api("/api/preview", form());
+    show($("previewCard"), true);
+    $("previewTitle").textContent = `Preview · ${p.count} commit(s) in ${p.branch} not in ${p.dev}`;
+    const notes = [`<b>${p.needs_change}</b> of ${p.count} need the email changed to <code>${esc(p.email)}</code>.`];
+    if (p.merges) notes.push(`${p.merges} merge commit(s) stay merges.`);
+    if (p.signed) notes.push(`<span class="badge badge-warning">${p.signed} signed commit(s) lose their signature</span>`);
+    $("previewBody").innerHTML = `<p class="text-sm" style="margin-bottom:.75rem">${notes.join(" ")}</p><div class="table-wrap"><table class="table"><thead><tr><th>Commit</th><th>Message</th><th>Author</th><th>Author email</th><th>Committer email</th></tr></thead><tbody>` +
+      p.commits.map(c => `<tr><td><code>${esc(c.short)}</code></td><td class="break">${esc(c.subject)}</td><td>${esc(c.author_name)}</td>` +
+        `<td class="break">${esc(c.author_email)}</td><td class="break">${esc(c.committer_email)}</td></tr>`).join("") + "</tbody></table></div>";
+  } catch (e) { showErr(e.message); }
+  finally { btn.disabled = false; btn.textContent = "Preview commits"; }
+};
+document.addEventListener("click", ev => {        // close an open Jira popover when clicking elsewhere
+  if (!ev.target.closest(".pop-anchor")) {
+    let changed = false;
+    for (const [id, st] of Object.entries(jiraState)) if (st.editing && !st.error && !st.busy) { delete jiraState[id]; changed = true; }
+    if (changed) renderIssues();
+  }
+});
+/* ---------------- Settings dialog ---------------- */
+const MAP_FIELDS = ["owner","repo","jira_project","jira_issue_type","jira_labels","dev","email","slack_channel","bot"];
+let editing = null;                                // {owner, repo} of the mapping being edited (null = new)
+async function openSettings(tab) {                // Settings are pages now (left menu > Administration)
+  go("settings/" + (tab || "repos"));
+  await loadSettings();
+}
+let settingsSeq = 0;
+async function loadSettings() {
+  const seq = ++settingsSeq;
+  let s;
+  try { s = await api("/api/settings"); }
+  catch (e) { toast(e.message, true); return; }
+  if (seq !== settingsSeq) return;
+  SETTINGS = s;
+  SLACK = {format: SETTINGS.slack.format, attach: SETTINGS.slack.attach}; shareText();
+  (SLACK.format === "messages" ? $("fmtMsg") : $("fmtHtml")).checked = true; setAttach(SLACK.attach); fmtHint(); attachHint();
+  show($("slackSetMsg"), false);
+  const env = SETTINGS.env || {};
+  $("m_jira_project").placeholder = env.jira_project || "e.g. EO";
+  $("m_jira_issue_type").placeholder = env.jira_issue_type || "Task";
+  $("m_jira_labels").placeholder = (env.jira_labels || []).join(", ") || "codeant, pr-review";
+  $("m_dev").placeholder = env.dev || "dev";
+  $("m_email").placeholder = env.email || "name@company.com";
+  $("m_slack_channel").placeholder = env.slack_channel || "C0123ABCD";
+  $("m_bot").placeholder = env.bot || "codeant";
+  renderMappings();
+}
+
+function renderMappings() {
+  const list = SETTINGS.repos || [];
+  if (!list.length) { $("mapList").innerHTML = '<div class="empty">No repositories mapped yet. Every repository uses the .env values.</div>'; return; }
+  const dash = '<span class="muted">.env</span>';
+  $("mapList").innerHTML = `<div class="table-wrap"><table class="table"><thead><tr><th>Repository</th><th>Jira project</th><th>Base branch</th><th>Commit email</th><th>Slack channel</th><th></th></tr></thead><tbody>` +
+    list.map((m, i) => `<tr><td class="break"><b>${esc(m.owner)}/${esc(m.repo)}</b></td>
+      <td>${m.jira_project ? `<span class="badge badge-secondary mono">${esc(m.jira_project)}</span>` : dash}${m.jira_issue_type ? ` <span class="muted text-xs">${esc(m.jira_issue_type)}</span>` : ""}</td>
+      <td>${m.dev ? `<code>${esc(m.dev)}</code>` : dash}</td><td class="break">${m.email ? esc(m.email) : dash}</td>
+      <td>${m.slack_channel ? `<code>${esc(m.slack_channel)}</code>` : dash}</td>
+      <td class="acts"><button class="btn btn-outline btn-xs" type="button" data-edit="${i}">Edit</button>
+        <button class="btn btn-ghost btn-xs" type="button" data-del="${i}">Delete</button></td></tr>`).join("") + "</tbody></table></div>";
+}
+$("mapList").addEventListener("click", async ev => {
+  const b = ev.target.closest("button"); if (!b) return;
+  const m = SETTINGS.repos[+(b.dataset.edit ?? b.dataset.del)]; if (!m) return;
+  if (b.dataset.edit !== undefined) { editMapping(m.owner, m.repo); return; }
+  if (!confirm(`Delete the settings of ${m.owner}/${m.repo}? It will use the .env values again.`)) return;
+  try { await api("/api/settings/repos/delete", {owner: m.owner, repo: m.repo}); toast(`Removed ${m.owner}/${m.repo}.`); await openSettings("repos"); refreshHomeRepo(m.owner, m.repo); }
+  catch (e) { toast(e.message, true); }
+});
+function editMapping(owner, repo) {
+  const m = (SETTINGS.repos || []).find(x => x.owner.toLowerCase() === (owner || "").toLowerCase() && x.repo.toLowerCase() === (repo || "").toLowerCase());
+  editing = m ? {owner: m.owner, repo: m.repo} : null;
+  const v = m || {owner: owner || $("owner").value.trim(), repo: repo || $("repo").value.trim()};
+  for (const k of MAP_FIELDS) $("m_" + k).value = k === "jira_labels" ? (v.jira_labels || []).join(", ") : (v[k] || "");
+  $("mapFormTitle").textContent = m ? `Edit ${m.owner}/${m.repo}` : "Add repository";
+  show($("mapMsg"), false); show($("mapForm"), true);
+  $(m ? "m_jira_project" : (v.repo ? "m_jira_project" : "m_repo")).focus();
+}
+$("mapAddBtn").onclick = () => editMapping($("owner").value.trim(), $("repo").value.trim());
+$("mapCancel").onclick = () => { show($("mapForm"), false); editing = null; };
+$("mapForm").addEventListener("submit", async ev => {
+  ev.preventDefault();
+  const d = Object.fromEntries(MAP_FIELDS.map(k => [k, $("m_" + k).value.trim()]));
+  d.jira_project = d.jira_project.toUpperCase();
+  if (editing) d.old = editing;
+  const btn = $("mapSave"); btn.disabled = true;
+  try {
+    const saved = await api("/api/settings/repos", d);
+    toast(`Saved settings for ${saved.owner}/${saved.repo}.`);
+    show($("mapForm"), false); editing = null;
+    await openSettings("repos");
+    refreshHomeRepo(saved.owner, saved.repo);
+  } catch (e) { $("mapMsg").textContent = e.message; show($("mapMsg"), true); }
+  finally { btn.disabled = false; }
+});
+function refreshHomeRepo(owner, repo) {          // the home page shows this repository: apply its new settings now
+  if ($("owner").value.trim().toLowerCase() === owner.toLowerCase() && $("repo").value.trim().toLowerCase() === repo.toLowerCase())
+    applyRepoSettings($("owner").value.trim(), $("repo").value.trim());
+}
+async function saveSlack(data) {
+  const btn = $("slackSave"); btn.disabled = true; show($("slackSetMsg"), false);
+  try {
+    const s = await api("/api/settings/slack", data);
+    SLACK = {format: s.format, attach: s.attach}; shareText();
+    (SLACK.format === "messages" ? $("fmtMsg") : $("fmtHtml")).checked = true; setAttach(SLACK.attach); fmtHint(); attachHint();
+    toast("Slack sharing saved."); checkSlack();
+  } catch (e) { $("slackSetMsg").textContent = e.message; show($("slackSetMsg"), true); }
+  finally { btn.disabled = false; }
+}
+$("slackSave").onclick = () => saveSlack({format: fmt(), attach: attach()});
+
+/* ---------------- Users & roles (admins) ---------------- */
+const ROLE_OPTS = [["", "None (Keycloak only)"], ["admin", "Admin"], ["reviewer", "Reviewer"], ["viewer", "Viewer"]];
+async function loadUsers() {
+  try { USERS = await api("/api/admin/users"); } catch (e) { $("userList").innerHTML = `<div class="empty">${esc(e.message)}</div>`; return; }
+  const rn = USERS.role_names || {};
+  $("rolesInfo").innerHTML = "A user's roles = their Keycloak roles (" + (USERS.roles || []).map(r => `<code>${esc(rn[r] || r)}</code>`).join(", ") +
+    ") + the portal role chosen here. <b>Admin</b>: everything, including this page. <b>Reviewer</b>: run reviews on assigned repositories, own reports, Jira, resend. <b>Viewer</b>: own reports, read only. Portal roles apply at the user's next page load.";
+  const list = USERS.users || [];
+  if (!list.length) { $("userList").innerHTML = '<div class="empty">No users yet. People appear here after their first login, or add them now.</div>'; return; }
+  $("userList").innerHTML = `<div class="table-wrap"><table class="table"><thead><tr><th>User</th><th>Portal role</th><th>Effective roles</th><th>Repositories</th><th>Last login</th><th></th></tr></thead><tbody>` +
+    list.map((u, i) => {
+      const admin = (u.roles || []).includes("admin"), me = (u.username || "").toLowerCase() === String(USERS.me || "").toLowerCase();
+      const repos = admin ? '<span class="badge badge-success">all (admin)</span>'
+        : u.repos.length ? `<div class="repo-chips">${u.repos.map(r => `<code>${esc(r)}</code>`).join("")}</div>` : '<span class="muted">none</span>';
+      const sel = `<select class="select role-sel" data-urole="${i}" aria-label="Portal role of ${esc(u.username)}"${me ? ' disabled title="You can\'t change your own role"' : ""}>` +
+        ROLE_OPTS.map(([v, t]) => `<option value="${v}"${(u.portal_role || "") === v ? " selected" : ""}>${t}</option>`).join("") + "</select>";
+      const eff = (u.roles || []).length ? u.roles.map(r => `<span class="badge ${r === "admin" ? "badge-info" : "badge-secondary"}">${esc(ROLE_NAMES[r] || r)}</span>`).join(" ") : '<span class="badge badge-destructive">no role</span>';
+      const kc = (u.keycloak_roles || []).length ? `<div class="muted text-xs" style="margin-top:.2rem">Keycloak: ${u.keycloak_roles.map(esc).join(", ")}</div>` : "";
+      return `<tr><td class="break"><b>${esc(u.username)}</b>${me ? ' <span class="badge badge-outline">you</span>' : ""}${u.name && u.name !== u.username ? `<div class="muted text-xs">${esc(u.name)}</div>` : ""}${u.email && u.email !== u.username ? `<div class="muted text-xs">${esc(u.email)}</div>` : ""}</td>
+        <td>${sel}${u.role_set_by ? `<div class="muted text-xs" style="margin-top:.2rem">by ${esc(u.role_set_by)}</div>` : ""}</td>
+        <td>${eff}${kc}</td><td>${repos}</td><td class="muted text-xs">${u.last_login ? esc(u.last_login.slice(0,16).replace("T"," ")) : "not logged in yet"}</td>
+        <td class="acts"><button class="btn btn-outline btn-xs" type="button" data-uedit="${i}">Edit</button>
+          <button class="btn btn-ghost btn-xs" type="button" data-udel="${i}"${me ? " disabled" : ""}>Remove</button></td></tr>`;
+    }).join("") + "</tbody></table></div>";
+}
+function editUser(u) {
+  $("u_username").value = u ? u.username : ""; $("u_username").readOnly = !!u;
+  $("u_repos").value = u ? u.repos.join("\n") : "";
+  $("u_role").value = u ? (u.portal_role || "") : "";
+  $("u_role").disabled = !!u && (u.username || "").toLowerCase() === String(USERS.me || "").toLowerCase();
+  $("userFormTitle").textContent = u ? `Edit ${u.username}` : "Add user";
+  show($("userMsg"), false); show($("userForm"), true);
+  $(u ? "u_role" : "u_username").focus();
+}
+$("userAddBtn").onclick = () => editUser(null);
+$("userCancel").onclick = () => show($("userForm"), false);
+$("userList").addEventListener("click", async ev => {
+  const b = ev.target.closest("button"); if (!b) return;
+  const u = (USERS.users || [])[+(b.dataset.uedit ?? b.dataset.udel)]; if (!u) return;
+  if (b.dataset.uedit !== undefined) { editUser(u); return; }
+  if (!confirm(`Remove ${u.username}, their portal role and repository access? Their Keycloak account is not changed.`)) return;
+  try { await api("/api/admin/users/delete", {username: u.username}); toast(`Removed ${u.username}.`); loadUsers(); }
+  catch (e) { toast(e.message, true); }
+});
+$("userList").addEventListener("change", async ev => {
+  const s = ev.target.closest("[data-urole]"); if (!s) return;
+  const u = (USERS.users || [])[+s.dataset.urole]; if (!u) return;
+  const role = s.value, name = (ROLE_OPTS.find(x => x[0] === role) || [, role])[1];
+  if ((role === "admin" || u.portal_role === "admin") && !confirm(role === "admin"
+      ? `Make ${u.username} an admin? Admins can see every report and change every setting, including roles.`
+      : `Remove the admin role from ${u.username}?`)) { s.value = u.portal_role || ""; return; }
+  s.disabled = true;
+  try { await api("/api/admin/users/role", {username: u.username, role}); toast(`${u.username}: portal role set to ${name}.`); }
+  catch (e) { toast(e.message, true); }
+  loadUsers();
+});
+$("userForm").addEventListener("submit", async ev => {
+  ev.preventDefault();
+  const btn = $("userSave"); btn.disabled = true;
+  const data = {username: $("u_username").value.trim(), repos: $("u_repos").value.split(/[\s,]+/).filter(Boolean)};
+  if (!$("u_role").disabled) data.role = $("u_role").value;
+  try {
+    const u = await api("/api/admin/users", data);
+    toast(`Saved ${u.username}.`); show($("userForm"), false); loadUsers();
+  } catch (e) { $("userMsg").textContent = e.message; show($("userMsg"), true); }
+  finally { btn.disabled = false; }
+});
+$("slackReset").onclick = () => saveSlack({format: "html", attach: ["html"]});
+
+
+/* ================= navigation (left menu + hash routes) ================= */
+const ROUTES = {
+  "dashboard":      {view: "dashboard", title: "Dashboard"},
+  "review":         {view: "review", title: "New review", perm: "review:run"},
+  "listen":         {view: "review", title: "Listen to a PR", perm: "review:run"},
+  "jobs":           {view: "jobs", title: "Jobs & progress", perm: "review:run"},
+  "reports":        {view: "reports", title: "Reports & issues"},
+  "settings/repos": {view: "settings-repos", title: "Repositories", perm: "settings:manage", group: "Administration"},
+  "settings/slack": {view: "settings-slack", title: "Slack sharing", perm: "settings:manage", group: "Administration"},
+  "settings/users": {view: "settings-users", title: "Users & roles", perm: "settings:manage", group: "Administration"},
+  "account":        {view: "account", title: "My access"},
+};
+let ROUTED = false, SLACK_STATUS = null, DASH = null, dashTimer = null;
+const currentPath = () => { const p = location.hash.replace(/^#\/?/, "").split("?")[0]; return ROUTES[p] ? p : "dashboard"; };
+function showView(path) {
+  const r = ROUTES[path] || ROUTES.dashboard;
+  document.querySelectorAll(".view").forEach(v => v.classList.toggle("active", v.id === "view-" + r.view));
+  document.querySelectorAll("[data-nav]").forEach(a => a.dataset.nav === path ? a.setAttribute("aria-current", "page") : a.removeAttribute("aria-current"));
+  $("crumbTitle").textContent = r.title;
+  $("crumb").innerHTML = `<span class="sep">/</span>${r.group ? `<span>${esc(r.group)}</span><span class="sep">/</span>` : ""}<b id="crumbTitle">${esc(r.title)}</b>`;
+  document.title = r.title + " · PR Review Runner";
+  document.body.classList.remove("nav-open"); $("navToggle").setAttribute("aria-expanded", "false");
+}
+function route() {
+  let path = currentPath();
+  const r = ROUTES[path];
+  if (r.perm && ME.username && !can(r.perm)) { toast("You don't have access to " + r.title + ".", true); path = "dashboard"; history.replaceState(null, "", "#/dashboard"); }
+  showView(path);
+  ROUTED = true;
+  if (path === "dashboard") loadDashboard();
+  else if (path === "settings/repos" || path === "settings/slack") loadSettings();
+  else if (path === "settings/users") loadUsers();
+  else if (path === "jobs") loadJobs();
+  else if (path === "reports") { if (!$("reportSel").options.length || !$("reportSel").value) loadReports(store.get("report", "")); }
+  else if (path === "account") renderAccount();
+  if (path === "listen") setTimeout(() => { $("listenCard").scrollIntoView({behavior: "smooth", block: "start"}); $("prnum").focus(); }, 30);
+  else window.scrollTo(0, 0);
+}
+function go(path) {
+  if (currentPath() === path && location.hash) { route(); return; }
+  location.hash = "#/" + path;                       // hashchange -> route()
+}
+window.addEventListener("hashchange", route);
+$("navToggle").onclick = () => { const on = document.body.classList.toggle("nav-open"); $("navToggle").setAttribute("aria-expanded", String(on)); };
+$("scrim").onclick = () => document.body.classList.remove("nav-open");
+document.addEventListener("click", ev => { const m = $("userChip"); if (m.open && !ev.target.closest("#userChip")) m.open = false; });
+document.addEventListener("keydown", ev => { if (ev.key === "Escape") { $("userChip").open = false; document.body.classList.remove("nav-open"); } });
+$("userChip").addEventListener("click", ev => { if (ev.target.closest(".menu a, .menu button")) $("userChip").open = false; });
+$("menuTheme").onclick = () => $("themeBtn").click();
+
+function openReport(id) { go("reports"); selectReport(id); }
+function jobReport(id) {
+  const a = $("jobReportLink"); show(a, !!id);
+  a.onclick = ev => { ev.preventDefault(); openReport(id); };
+}
+function updateJobCount(jobs) {
+  const n = (jobs || []).filter(j => j.status === "running").length;
+  $("navJobs").textContent = n ? n + " running" : ""; show($("navJobs"), n > 0);
+}
+$("deleteReportBtn").onclick = async () => {
+  if (!REPORT) return;
+  const p = REPORT.pr || {};
+  if (!confirm(`Delete the report of ${p.owner}/${p.repo} #${p.number}? Its issues and Slack history are removed from the portal. Jira tickets and Slack messages stay.`)) return;
+  try { await api(`/api/reports/${encodeURIComponent(REPORT.id)}/delete`, {}); toast("Report deleted."); REPORT = null; store.set("report", "");
+        $("issuesWrap").innerHTML = '<div class="empty">Report deleted.</div>'; loadReports(); }
+  catch (e) { toast(e.message, true); }
+};
+
+/* ================= dashboard ================= */
+const SEV_VAR = s => `var(--sev-${String(s).toLowerCase()})`;
+const num = n => Number(n || 0).toLocaleString();
+const pct = (a, b) => b ? Math.round(100 * a / b) : 0;
+function ago(iso) {
+  const t = Date.parse(iso || ""); if (!t) return "—";
+  const s = Math.max(0, (Date.now() - t) / 1000);
+  if (s < 60) return "just now"; if (s < 3600) return Math.floor(s / 60) + " min ago";
+  if (s < 86400) return Math.floor(s / 3600) + " h ago"; if (s < 86400 * 30) return Math.floor(s / 86400) + " d ago";
+  return new Date(t).toLocaleDateString();
+}
+const fmtDay = d => new Date(d + "T00:00:00").toLocaleDateString(undefined, {month: "short", day: "numeric"});
+function sevMini(by) {
+  const parts = SEV.filter(s => (by || {})[s]).map(s => `<span title="${s}"><i style="--c:${SEV_VAR(s)}"></i>${by[s]} ${s}</span>`);
+  return parts.length ? `<span class="sev-mini">${parts.join("")}</span>` : '<span class="muted text-xs">none</span>';
+}
+async function loadDashboard() {
+  clearTimeout(dashTimer);
+  try { DASH = await api("/api/dashboard?days=" + encodeURIComponent($("dashDays").value)); }
+  catch (e) { $("dashTiles").innerHTML = `<div class="alert alert-destructive" style="grid-column:1/-1">${esc(e.message)}</div>`; return; }
+  renderDashboard();
+  if (currentPath() === "dashboard" && (DASH.jobs.running.length || DASH.totals.listening))
+    dashTimer = setTimeout(() => currentPath() === "dashboard" && loadDashboard(), 20000);
+}
+$("dashRefresh").onclick = loadDashboard;
+$("dashDays").onchange = loadDashboard;
+function renderDashboard() {
+  const d = DASH; if (!d) return;
+  const t = d.totals, sev = d.severity || {};
+  const crit = (sev.Critical || 0) + (sev.Major || 0);
+  $("dashScope").textContent = can("report:read_all") ? "Overview of every report in the portal (admin view)." : "Overview of your own reports.";
+  const tile = (label, value, sub, href, mark) => `<${href ? `a href="${href}"` : "div"} class="tile"><div class="t-label">${mark || ""}${esc(label)}</div>
+      <div class="t-value">${value}</div><div class="t-sub">${sub}</div></${href ? "a" : "div"}>`;
+  $("dashTiles").innerHTML = [
+    tile("Reports", num(t.reports), `${num(t.week_reports)} in the last 7 days`, "#/reports"),
+    tile("Open issues", num(t.issues), `${num(t.week_issues)} new this week · ${num(t.files)} files`, "#/reports"),
+    tile("Critical + Major", num(crit), `${num(sev.Critical)} Critical · ${num(sev.Major)} Major`, "#/reports", `<i class="mark" style="background:hsl(${SEV_VAR("critical")})"></i>`),
+    tile("Without Jira ticket", num(d.without_jira), d.critical_without_jira ? `${num(d.critical_without_jira)} of them Critical/Major` : "all serious issues ticketed", "#/reports"),
+    tile("Jira tickets", num(t.jira), `${pct(t.jira, t.issues)}% of issues ticketed`),
+    tile("Jobs running", num(d.jobs.running.length), `${num(t.listening)} report(s) still listening` + (d.jobs.failed ? ` · ${d.jobs.failed} failed` : ""), can("review:run") ? "#/jobs" : ""),
+  ].join("");
+
+  // severity: one stacked bar + legend with values (identity is never colour-only)
+  const total = SEV.reduce((a, s) => a + (sev[s] || 0), 0);
+  $("dashSev").innerHTML = !total ? '<div class="empty"><span class="big">🎉</span>No open issues.</div>' :
+    `<div class="sevbar" role="img" aria-label="${esc(SEV.map(s => `${s} ${sev[s] || 0}`).join(", "))}">` +
+      SEV.filter(s => sev[s]).map(s => `<span style="--c:${SEV_VAR(s)};flex:${sev[s]} 1 0" data-tip="${s}: ${sev[s]} (${pct(sev[s], total)}%)"></span>`).join("") + "</div>" +
+    `<div class="legend">` + SEV.map(s => `<span class="k"><i style="--c:${SEV_VAR(s)}"></i>${s}</span><span class="v">${num(sev[s])}</span><span class="p">${pct(sev[s] || 0, total)}%</span>`).join("") + "</div>";
+
+  // issues per day: single series bars, peak labelled, hover tooltip, table view
+  const days = d.daily || [], max = Math.max(1, ...days.map(x => x.issues));
+  const peak = days.reduce((b, x, i) => x.issues > (days[b] || {issues: -1}).issues ? i : b, 0);
+  const sumIssues = days.reduce((a, x) => a + x.issues, 0), sumReps = days.reduce((a, x) => a + x.reports, 0);
+  $("dailyDesc").textContent = `${num(sumIssues)} issue(s) in ${num(sumReps)} report(s) · last ${days.length} days`;
+  $("dashDaily").innerHTML = !sumReps ? `<div class="empty">No reports in the last ${days.length} days.</div>` :
+    `<div class="bars" role="img" aria-label="Issues per day, peak ${days[peak].issues} on ${fmtDay(days[peak].day)}"><span class="ymax">${max}</span>` +
+      days.map((x, i) => { const h = Math.round(100 * x.issues / max);
+        return `<div class="col${x.issues ? "" : " zero"}" style="--h:${h}%" data-tip="${fmtDay(x.day)}: ${x.issues} issue(s), ${x.reports} report(s)"><i style="height:${h}%"></i>${i === peak && x.issues ? `<span class="lbl">${x.issues}</span>` : ""}</div>`; }).join("") +
+    `</div><div class="bars-x"><span>${fmtDay(days[0].day)}</span><span>${fmtDay(days[Math.floor(days.length / 2)].day)}</span><span>${fmtDay(days[days.length - 1].day)}</span></div>
+    <details class="accordion flat" style="margin-top:.6rem"><summary class="text-xs">Show as table</summary><div class="accordion-content"><div class="table-wrap"><table class="table"><thead><tr><th>Day</th><th class="right">Reports</th><th class="right">Issues</th></tr></thead><tbody>` +
+      days.filter(x => x.reports).map(x => `<tr><td>${fmtDay(x.day)}</td><td class="right">${x.reports}</td><td class="right">${x.issues}</td></tr>`).join("") + "</tbody></table></div></div></details>";
+
+  // recent reports
+  const rec = d.recent || [];
+  $("dashRecent").innerHTML = !rec.length ? `<div class="empty"><span class="big">📋</span>No reports yet.${can("review:run") ? ' <a href="#/review">Start a review</a>.' : ""}</div>` :
+    `<div class="table-wrap"><table class="table"><thead><tr><th>Report</th><th>Issues</th><th class="right">Jira</th><th>Slack</th><th>Created</th></tr></thead><tbody>` +
+    rec.map(r => { const p = r.pr || {}, s = r.summary || {}, sl = r.slack || {};
+      return `<tr class="link" data-report="${esc(r.id)}" tabindex="0"><td class="break"><b>${esc(p.repo)} #${esc(p.number)}</b><div class="muted text-xs">${esc(p.title || "")}${can("report:read_all") ? " · " + esc((r.created_by || {}).username || "run.py / Slack") : ""}</div></td>
+        <td>${sevMini(s.by_severity)}</td><td class="right">${num(s.jira)}/${num(s.total)}</td>
+        <td>${r.status === "listening" ? '<span class="badge badge-info">listening</span>' : sl.delivered ? '<span class="badge badge-success">sent</span>' : sl.at ? '<span class="badge badge-destructive">failed</span>' : '<span class="badge badge-outline">not sent</span>'}</td>
+        <td class="muted text-xs nowrap" title="${esc(r.created_at || "")}">${ago(r.created_at)}</td></tr>`; }).join("") + "</tbody></table></div>";
+
+  // quick actions
+  const latest = rec[0];
+  $("dashQuick").innerHTML = [
+    can("review:run") ? `<a href="#/review"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M12 8v8M8 12h8"/></svg><span><b>New review</b><span class="d">Rewrite email, open PR, report</span></span></a>` : "",
+    can("review:run") ? `<a href="#/listen"><svg viewBox="0 0 24 24"><path d="M2 12h3l3-8 4 16 3-8h7"/></svg><span><b>Listen to a PR</b><span class="d">Report on an existing PR</span></span></a>` : "",
+    latest ? `<a href="#/reports" data-report="${esc(latest.id)}"><svg viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><path d="M14 2v6h6"/></svg><span><b>Latest report</b><span class="d">${esc((latest.pr || {}).repo)} #${esc((latest.pr || {}).number)}</span></span></a>` : "",
+    can("settings:manage") ? `<a href="#/settings/users"><svg viewBox="0 0 24 24"><circle cx="9" cy="7" r="4"/><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/></svg><span><b>Users &amp; roles</b><span class="d">Assign admins and access</span></span></a>` : "",
+    can("settings:manage") ? `<a href="#/settings/repos"><svg viewBox="0 0 24 24"><path d="M3 7a2 2 0 0 1 2-2h4l2 2h8a2 2 0 0 1 2 2v8a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/></svg><span><b>Repositories</b><span class="d">Jira project &amp; defaults</span></span></a>` : "",
+    `<a href="#/account"><svg viewBox="0 0 24 24"><circle cx="12" cy="8" r="4"/><path d="M4 21v-1a6 6 0 0 1 6-6h4a6 6 0 0 1 6 6v1"/></svg><span><b>My access</b><span class="d">Roles &amp; repositories</span></span></a>`,
+  ].filter(Boolean).join("");
+
+  // repositories
+  const repos = d.repos || [];
+  $("dashRepos").innerHTML = !repos.length ? '<div class="empty">No repositories reviewed yet.</div>' :
+    `<div class="table-wrap"><table class="table"><thead><tr><th>Repository</th><th class="right">Reports</th><th class="right">Issues</th><th class="right">Crit/Maj</th></tr></thead><tbody>` +
+    repos.map(r => `<tr><td class="break"><b>${esc(r.repo)}</b><div class="muted text-xs">last ${ago(r.last)} · ${pct(r.jira, r.issues)}% ticketed</div></td><td class="right">${num(r.reports)}</td><td class="right">${num(r.issues)}</td><td class="right">${num(r.critical)}/${num(r.major)}</td></tr>`).join("") + "</tbody></table></div>";
+
+  // authors & categories: labelled single-hue bars
+  const hbars = (rows, key, val, sub) => { const m = Math.max(1, ...rows.map(r => r[val]));
+    return rows.map(r => `<div class="hbar"><span class="break">${esc(r[key])}${sub ? `<span class="muted text-xs"> · ${sub(r)}</span>` : ""}</span><span class="v">${num(r[val])}</span><span class="track"><i style="width:${pct(r[val], m)}%"></i></span></div>`).join(""); };
+  $("dashAuthors").innerHTML = !(d.authors || []).length ? '<div class="empty">No issues yet.</div>' : hbars(d.authors, "email", "issues", r => `${num(r.open)} without ticket`);
+  $("dashCats").innerHTML = !(d.categories || []).length ? '<div class="empty">No issues yet.</div>' : hbars(d.categories, "category", "issues");
+
+  // running jobs
+  const run = d.jobs.running || [];
+  $("dashJobs").innerHTML = !run.length ? `<div class="empty">Nothing running right now.${d.jobs.total ? ` ${d.jobs.total} job(s) this session.` : ""}</div>` :
+    `<div class="table-wrap"><table class="table"><thead><tr><th>Job</th><th>Step</th><th>Started</th>${can("report:read_all") ? "<th>By</th>" : ""}</tr></thead><tbody>` +
+    run.map(j => { const st = (j.steps || []).find(s => s.state === "run") || {};
+      return `<tr class="link" data-job="${esc(j.id)}" tabindex="0"><td><b>#${esc(j.id)}</b> ${esc(j.label)}</td><td><span class="badge badge-info"><span class="spinner" style="width:.6rem;height:.6rem"></span>${esc(st.name || "starting")}</span></td>
+        <td class="muted text-xs">${ago(new Date(j.started * 1000).toISOString())}</td>${can("report:read_all") ? `<td>${esc(j.user || "")}</td>` : ""}</tr>`; }).join("") + "</tbody></table></div>";
+  renderSystem();
+}
+function renderSystem() {
+  const d = DASH; if (!d) return;
+  const i = d.integrations || {};
+  const row = (ok, name, text) => `<div class="s-row"><span class="badge ${ok === true ? "badge-success" : ok === "warn" ? "badge-warning" : "badge-destructive"}">${ok === true ? "✓" : ok === "warn" ? "!" : "✕"}</span><div class="grow"><b>${esc(name)}</b><div class="muted">${text}</div></div></div>`;
+  const sl = SLACK_STATUS;
+  const rows = [
+    row(true, "Keycloak login", typeof i.keycloak === "string" ? esc(i.keycloak) : "required for everyone"),
+    row(i.github || "warn", "GitHub", i.github ? "token configured" : "GITHUB_TOKEN missing in .env"),
+    row(i.jira || "warn", "Jira", i.jira ? `project ${esc(JIRA.project || "")}` : "not configured"),
+    row(sl ? (sl.ok || (sl.webhook || sl.token ? "warn" : false)) : "warn", "Slack", sl ? esc(sl.ok ? "report attachments work" : (sl.hint || "summary only")) : "checking…"),
+  ];
+  if (d.users) rows.push(row(d.users.admins ? true : "warn", "Users", `${num(d.users.total)} user(s) · ${num(d.users.admins)} admin(s)` +
+    (d.users.no_role ? ` · ${num(d.users.no_role)} without a role` : "") + (d.users.never_logged_in ? ` · ${num(d.users.never_logged_in)} not logged in yet` : "") +
+    ` · <a href="#/settings/users">manage</a>`));
+  $("dashSystem").innerHTML = rows.join("");
+}
+document.addEventListener("click", ev => {
+  const r = ev.target.closest("[data-report]"); if (r && r.closest("#view-dashboard")) { ev.preventDefault(); openReport(r.dataset.report); return; }
+  const j = ev.target.closest("tr[data-job]"); if (j) { go("jobs"); api("/api/jobs").then(x => { const job = x.jobs.find(y => String(y.id) === j.dataset.job); if (job) openJob(job); }); }
+});
+document.addEventListener("keydown", ev => {
+  if (ev.key === "Enter" && ev.target.matches && ev.target.matches("tr[data-report], tr[data-job]")) ev.target.click();
+});
+
+/* ================= my access ================= */
+const PERM_TEXT = {"review:run": "Preview, run and listen on your repositories", "report:read": "Open your own reports",
+  "report:read_all": "Open every report (all users, run.py, Slack bot)", "jira:create": "Create Jira tickets", "slack:resend": "Resend reports to Slack",
+  "settings:manage": "Manage repositories, Slack sharing, users and roles", "repo:all": "Use every repository"};
+let MY_REPOS = null;
+function renderAccount() {
+  const u = ME || {};
+  $("accKv").innerHTML = [["Name", esc(u.name || "")], ["Username", `<code>${esc(u.username || "")}</code>`], ["Email", esc(u.email || "—")],
+    ["Roles", (u.roles || []).map(r => `<span class="badge badge-secondary">${esc(ROLE_NAMES[r] || r)}</span>`).join(" ") || '<span class="badge badge-destructive">no role</span>'],
+    ["From Keycloak", (u.keycloak_roles || []).map(r => `<code>${esc(r)}</code>`).join(" ") || '<span class="muted">none</span>'],
+    ["Given in the portal", u.portal_role ? `<code>${esc(u.portal_role)}</code>` : '<span class="muted">none</span>']]
+    .map(([k, v]) => `<tr><th>${k}</th><td>${v}</td></tr>`).join("");
+  $("accRepos").innerHTML = can("repo:all") ? '<span class="badge badge-success">Every repository (admin)</span>'
+    : (MY_REPOS || []).length ? `<div class="repo-chips">${MY_REPOS.map(r => `<code>${esc(r)}</code>`).join("")}</div>`
+    : '<div class="empty">No repositories assigned. Ask an admin to add some in Users &amp; roles.</div>';
+  $("accPerms").innerHTML = `<div class="table-wrap"><table class="table"><tbody>` + Object.entries(PERM_TEXT).map(([p, t]) =>
+    `<tr><td style="width:1%">${can(p) ? '<span class="badge badge-success">✓</span>' : '<span class="badge badge-outline">—</span>'}</td><td>${esc(t)}</td><td class="muted text-xs mono right">${esc(p)}</td></tr>`).join("") + "</tbody></table></div>";
+}
+
+showView(currentPath());
+init().finally(route);
+</script>
+</body>
+</html>

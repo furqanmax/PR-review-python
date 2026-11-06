@@ -1,0 +1,316 @@
+{
+ "id": "earnon-pr113-20261102-135752",
+ "version": 1,
+ "created_at": "2026-11-02T13:57:52+05:30",
+ "status": "finished",
+ "pr": {
+  "owner": "Bizionic-Tech",
+  "repo": "earnon",
+  "number": 113,
+  "title": "Email update: threshold-manage-email-fix-20261102-131520",
+  "url": "https://github.com/Bizionic-Tech/earnon/pull/113",
+  "head": "threshold-manage-email-fix-20261102-131520",
+  "base": "dev-20261102-131520",
+  "state": "open",
+  "merged": false
+ },
+ "rewrite": {
+  "original_branch": "threshold-manage",
+  "head": "threshold-manage-email-fix-20261102-131520",
+  "base": "dev-20261102-131520"
+ },
+ "requester": null,
+ "mode": "html",
+ "commits": [
+  {
+   "sha": "f8875264ee2e6ae2b18b90976987307ca302bcfa",
+   "short": "f887526",
+   "subject": "threshold manage",
+   "author_name": "Ajaruddin",
+   "author_email": "ajaruddin@bizionictech.com",
+   "author_date": "2026-10-30T12:40:30Z",
+   "committer_email": "ajaruddin@bizionictech.com"
+  },
+  {
+   "sha": "60a9ba0429618c284b77ceb8eeb85ba50b8a4204",
+   "short": "60a9ba0",
+   "subject": "Merge branch 'dev' of https://git-codecommit.ap-south-1.amazonaws.com/v1/repos/earnon into threshold-manage",
+   "author_name": "Ajaruddin",
+   "author_email": "ajaruddin@bizionictech.com",
+   "author_date": "2026-10-31T05:40:46Z",
+   "committer_email": "ajaruddin@bizionictech.com"
+  },
+  {
+   "sha": "fb13cc87478588c5ef1a5030d8bb44992ca9876b",
+   "short": "fb13cc8",
+   "subject": "Refactor reCAPTCHA Enterprise verification, event context, and assessment annotations with optional 2FA login workflow",
+   "author_name": "Ajaruddin",
+   "author_email": "ajaruddin@bizionictech.com",
+   "author_date": "2026-10-31T06:54:42Z",
+   "committer_email": "ajaruddin@bizionictech.com"
+  },
+  {
+   "sha": "b947530a08f2f9bc03346adfbf985e7a76d2e98e",
+   "short": "b947530",
+   "subject": "Address PR review comments: harden assessment annotation security, fix Cache import and threshold precedence",
+   "author_name": "Ajaruddin",
+   "author_email": "ajaruddin@bizionictech.com",
+   "author_date": "2026-10-31T07:52:47Z",
+   "committer_email": "ajaruddin@bizionictech.com"
+  },
+  {
+   "sha": "6655745111ae59045ecd2c4db198bacd0b7f9924",
+   "short": "6655745",
+   "subject": "threshold manage",
+   "author_name": "Ajaruddin",
+   "author_email": "ajaruddin@bizionictech.com",
+   "author_date": "2026-10-31T10:03:25Z",
+   "committer_email": "ajaruddin@bizionictech.com"
+  }
+ ],
+ "authors_source": "original-branch",
+ "file_authors": {
+  "app/Filament/Pages/Settings.php": {
+   "email": "ajaruddin@bizionictech.com",
+   "name": "Ajaruddin",
+   "sha": "f8875264ee2e6ae2b18b90976987307ca302bcfa",
+   "date": "2026-10-30T12:40:30Z",
+   "usable": true
+  },
+  "app/Services/CaptchaService.php": {
+   "email": "ajaruddin@bizionictech.com",
+   "name": "Ajaruddin",
+   "sha": "6655745111ae59045ecd2c4db198bacd0b7f9924",
+   "date": "2026-10-31T10:03:25Z",
+   "usable": true
+  },
+  "app/Services/RecaptchaEnterpriseService.php": {
+   "email": "ajaruddin@bizionictech.com",
+   "name": "Ajaruddin",
+   "sha": "6655745111ae59045ecd2c4db198bacd0b7f9924",
+   "date": "2026-10-31T10:03:25Z",
+   "usable": true
+  },
+  "config/captcha.php": {
+   "email": "ajaruddin@bizionictech.com",
+   "name": "Ajaruddin",
+   "sha": "f8875264ee2e6ae2b18b90976987307ca302bcfa",
+   "date": "2026-10-30T12:40:30Z",
+   "usable": true
+  },
+  "tests/Unit/RecaptchaEnterpriseAssessmentTest.php": {
+   "email": "ajaruddin@bizionictech.com",
+   "name": "Ajaruddin",
+   "sha": "6655745111ae59045ecd2c4db198bacd0b7f9924",
+   "date": "2026-10-31T10:03:25Z",
+   "usable": true
+  },
+  "app/Http/Controllers/PostsController.php": {
+   "email": "ajaruddin@bizionictech.com",
+   "name": "Ajaruddin",
+   "sha": "60a9ba0429618c284b77ceb8eeb85ba50b8a4204",
+   "date": "2026-10-31T05:40:46Z",
+   "usable": true
+  },
+  "app/Model/UserPostStreakLog.php": {
+   "email": "ajaruddin@bizionictech.com",
+   "name": "Ajaruddin",
+   "sha": "60a9ba0429618c284b77ceb8eeb85ba50b8a4204",
+   "date": "2026-10-31T05:40:46Z",
+   "usable": true
+  },
+  "app/Providers/GenericHelperServiceProvider.php": {
+   "email": "ajaruddin@bizionictech.com",
+   "name": "Ajaruddin",
+   "sha": "60a9ba0429618c284b77ceb8eeb85ba50b8a4204",
+   "date": "2026-10-31T05:40:46Z",
+   "usable": true
+  },
+  "app/Repositories/PostsRepository.php": {
+   "email": "ajaruddin@bizionictech.com",
+   "name": "Ajaruddin",
+   "sha": "60a9ba0429618c284b77ceb8eeb85ba50b8a4204",
+   "date": "2026-10-31T05:40:46Z",
+   "usable": true
+  },
+  "app/Services/PostsService.php": {
+   "email": "ajaruddin@bizionictech.com",
+   "name": "Ajaruddin",
+   "sha": "60a9ba0429618c284b77ceb8eeb85ba50b8a4204",
+   "date": "2026-10-31T05:40:46Z",
+   "usable": true
+  },
+  "database/migrations/2026_10_30_150000_create_user_post_streak_logs_table.php": {
+   "email": "ajaruddin@bizionictech.com",
+   "name": "Ajaruddin",
+   "sha": "60a9ba0429618c284b77ceb8eeb85ba50b8a4204",
+   "date": "2026-10-31T05:40:46Z",
+   "usable": true
+  },
+  "resources/views/elements/new-feed/eaon-reward-card-widget.html": {
+   "email": "ajaruddin@bizionictech.com",
+   "name": "Ajaruddin",
+   "sha": "60a9ba0429618c284b77ceb8eeb85ba50b8a4204",
+   "date": "2026-10-31T05:40:46Z",
+   "usable": true
+  },
+  "app/Http/Controllers/Api/AuthController.php": {
+   "email": "ajaruddin@bizionictech.com",
+   "name": "Ajaruddin",
+   "sha": "6655745111ae59045ecd2c4db198bacd0b7f9924",
+   "date": "2026-10-31T10:03:25Z",
+   "usable": true
+  },
+  "app/Http/Controllers/Api/TwoFAController.php": {
+   "email": "ajaruddin@bizionictech.com",
+   "name": "Ajaruddin",
+   "sha": "b947530a08f2f9bc03346adfbf985e7a76d2e98e",
+   "date": "2026-10-31T07:52:47Z",
+   "usable": true
+  },
+  "config/services.php": {
+   "email": "ajaruddin@bizionictech.com",
+   "name": "Ajaruddin",
+   "sha": "6655745111ae59045ecd2c4db198bacd0b7f9924",
+   "date": "2026-10-31T10:03:25Z",
+   "usable": true
+  },
+  "app/Services/AuthenticationService.php": {
+   "email": "ajaruddin@bizionictech.com",
+   "name": "Ajaruddin",
+   "sha": "6655745111ae59045ecd2c4db198bacd0b7f9924",
+   "date": "2026-10-31T10:03:25Z",
+   "usable": true
+  }
+ },
+ "default_author": {
+  "email": "ajaruddin@bizionictech.com",
+  "name": "Ajaruddin",
+  "sha": "6655745111ae59045ecd2c4db198bacd0b7f9924",
+  "date": "2026-10-31T10:03:25Z",
+  "usable": true
+ },
+ "issues": [
+  {
+   "id": "c4439941785",
+   "gh_id": 4439941785,
+   "kind": "inline",
+   "path": "app/Services/AuthenticationService.php",
+   "line": 25,
+   "start_line": 24,
+   "outdated": false,
+   "severity": "Critical",
+   "rank": 0,
+   "category": "Custom rule security",
+   "occurrence": null,
+   "suggestion": "Use an atomic cache increment with the 15-minute expiry so concurrent failed-login requests cannot overwrite each other’s counts.",
+   "prompt": "This is a comment left during a code review.\n\n**Path:** app/Services/AuthenticationService.php\n**Line:** 24:25\n**Comment:**\n\t*Custom Rule Security: Use an atomic cache increment with the 15-minute expiry so concurrent failed-login requests cannot overwrite each other’s counts.\n\nValidate the correctness of the flagged issue. If correct, How can I resolve this? If you propose a fix, implement it and please make it concise.\nOnce fix is implemented, also check other comments on the same PR, and ask user if the user wants to fix the rest of the comments as well. if said yes, then fetch all the comments validate the correctness and implement a minimal fix",
+   "body": "**Suggestion:** Use an atomic cache increment with the 15-minute expiry so concurrent failed-login requests cannot overwrite each other’s counts.\n\n**Severity Level:** Critical 🚨 · 🏷️ `Custom_rule_security`\n<details>\n<summary><b>Rule source 📖 </b></summary>\n\nCodeAnt dashboard (rule \"rules-1790680420739-jowv2yvv2\")\n</details>\n\n[![Use CodeAnt Skill](https://new-codeant-butcket.s3.us-west-1.amazonaws.com/badges/use-codeant-skill-flat-v2.svg)](https://docs.codeant.ai/cli/resolve-pr-comments-skill) [![Fix in Cursor](https://new-codeant-butcket.s3.us-west-1.amazonaws.com/badges/fix-in-cursor-flat.svg)](https://app.codeant.ai/fix-in-ide?tool=cursor&prompt_id=7f6cb872127644af9635cc594fde8cbf&service=github&base_url=https%3A%2F%2Fgithub.com&org=Bizionic-Tech&repo=Bizionic-Tech%2Fearnon) [![Fix in VSCode Claude](https://new-codeant-butcket.s3.us-west-1.amazonaws.com/badges/fix-in-vscode-claude-flat.svg)](https://app.codeant.ai/fix-in-ide?tool=vscode-claude&prompt_id=7f6cb872127644af9635cc594fde8cbf&service=github&base_url=https%3A%2F%2Fgithub.com&org=Bizionic-Tech&repo=Bizionic-Tech%2Fearnon)\n<details>\n<summary><b>Prompt for AI Agent 🤖 </b></summary>\n\n```mdx\nThis is a comment left during a code review.\n\n**Path:** app/Services/AuthenticationService.php\n**Line:** 24:25\n**Comment:**\n\t*Custom Rule Security: Use an atomic cache increment with the 15-minute expiry so concurrent failed-login requests cannot overwrite each other’s counts.\n\nValidate the correctness of the flagged issue. If correct, How can I resolve this? If you propose a fix, implement it and please make it concise.\nOnce fix is implemented, also check other comments on the same PR, and ask user if the user wants to fix the rest of the comments as well. if said yes, then fetch all the comments validate the correctness and implement a minimal fix\n```\n</details>\n<a href='https://app.codeant.ai/feedback?pr_url=https%3A%2F%2Fgithub.com%2FBizionic-Tech%2Fearnon%2Fpull%2F113&comment_hash=aed35715b41c560b1959eb4025f41b52df9fdeea9f6c1edf97eb49a113791616&reaction=like'>👍</a> | <a href='https://app.codeant.ai/feedback?pr_url=https%3A%2F%2Fgithub.com%2FBizionic-Tech%2Fearnon%2Fpull%2F113&comment_hash=aed35715b41c560b1959eb4025f41b52df9fdeea9f6c1edf97eb49a113791616&reaction=dislike'>👎</a>",
+   "diff_hunk": "@@ -0,0 +1,54 @@\n+<?php\n+\n+namespace App\\Services;\n+\n+use Illuminate\\Support\\Facades\\Cache;\n+\n+class AuthenticationService\n+{\n+    public const FAILED_ATTEMPTS_THRESHOLD = 3;\n+    public const FAILED_ATTEMPTS_TTL_MINUTES = 15;\n+\n+    public function __construct(\n+        protected ?RecaptchaEnterpriseService $recaptchaEnterpriseService = null\n+    ) {\n+        $this->recaptchaEnterpriseService = $recaptchaEnterpriseService ?? app(RecaptchaEnterpriseService::class);\n+    }\n+\n+    /**\n+     * Record a failed login attempt, increment counter, and classify as fraudulent if threshold reached.\n+     */\n+    public function recordFailedLogin(string $email, string $ip, ?string $assessmentName = null): int\n+    {\n+        $cacheKey = $this->getFailedAttemptsCacheKey($email, $ip);\n+        $attempts = (int) Cache::get($cacheKey, 0) + 1;\n+        Cache::put($cacheKey, $attempts, now()->addMinutes(self::FAILED_ATTEMPTS_TTL_MINUTES));",
+   "url": "https://github.com/Bizionic-Tech/earnon/pull/113#discussion_r4439941785",
+   "bot": "codeant-ai[bot]",
+   "created_at": "2026-11-02T07:47:29Z",
+   "updated_at": "2026-11-02T07:47:29Z",
+   "replies": [],
+   "removed": false,
+   "author": {
+    "email": "ajaruddin@bizionictech.com",
+    "name": "Ajaruddin",
+    "sha": "6655745111ae59045ecd2c4db198bacd0b7f9924",
+    "date": "2026-10-31T10:03:25Z",
+    "usable": true,
+    "source": "file"
+   }
+  },
+  {
+   "id": "c4440002062",
+   "gh_id": 4440002062,
+   "kind": "inline",
+   "path": "app/Services/RecaptchaEnterpriseService.php",
+   "line": 132,
+   "start_line": 130,
+   "outdated": false,
+   "severity": "Major",
+   "rank": 1,
+   "category": "Logic error",
+   "occurrence": "Sometimes",
+   "suggestion": "The default numeric services threshold is returned before the captcha threshold, so deployments using the existing captcha setting can silently enforce a different score.",
+   "prompt": "This is a comment left during a code review.\n\n**Path:** app/Services/RecaptchaEnterpriseService.php\n**Line:** 130:132\n**Comment:**\n\t*Logic Error: The default numeric services threshold is returned before the captcha threshold, so deployments using the existing captcha setting can silently enforce a different score.\n\nValidate the correctness of the flagged issue. If correct, How can I resolve this? If you propose a fix, implement it and please make it concise.\nOnce fix is implemented, also check other comments on the same PR, and ask user if the user wants to fix the rest of the comments as well. if said yes, then fetch all the comments validate the correctness and implement a minimal fix",
+   "body": "**Suggestion:** The default numeric services threshold is returned before the captcha threshold, so deployments using the existing captcha setting can silently enforce a different score.\n\n**Assessment:** 🟠 `Major` · 🔁 `Occurrence: Sometimes` · 🏷️ `Logic error`\n\n[![Use CodeAnt Skill](https://new-codeant-butcket.s3.us-west-1.amazonaws.com/badges/use-codeant-skill-flat-v2.svg)](https://docs.codeant.ai/cli/resolve-pr-comments-skill) [![Fix in Cursor](https://new-codeant-butcket.s3.us-west-1.amazonaws.com/badges/fix-in-cursor-flat.svg)](https://app.codeant.ai/fix-in-ide?tool=cursor&prompt_id=ac203fa837424fb58f32adfaf0635db7&service=github&base_url=https%3A%2F%2Fgithub.com&org=Bizionic-Tech&repo=Bizionic-Tech%2Fearnon) [![Fix in VSCode Claude](https://new-codeant-butcket.s3.us-west-1.amazonaws.com/badges/fix-in-vscode-claude-flat.svg)](https://app.codeant.ai/fix-in-ide?tool=vscode-claude&prompt_id=ac203fa837424fb58f32adfaf0635db7&service=github&base_url=https%3A%2F%2Fgithub.com&org=Bizionic-Tech&repo=Bizionic-Tech%2Fearnon)\n<details>\n<summary><b>Prompt for AI Agent 🤖 </b></summary>\n\n```mdx\nThis is a comment left during a code review.\n\n**Path:** app/Services/RecaptchaEnterpriseService.php\n**Line:** 130:132\n**Comment:**\n\t*Logic Error: The default numeric services threshold is returned before the captcha threshold, so deployments using the existing captcha setting can silently enforce a different score.\n\nValidate the correctness of the flagged issue. If correct, How can I resolve this? If you propose a fix, implement it and please make it concise.\nOnce fix is implemented, also check other comments on the same PR, and ask user if the user wants to fix the rest of the comments as well. if said yes, then fetch all the comments validate the correctness and implement a minimal fix\n```\n</details>\n<a href='https://app.codeant.ai/feedback?pr_url=https%3A%2F%2Fgithub.com%2FBizionic-Tech%2Fearnon%2Fpull%2F113&comment_hash=c2ff8eda8d955775ae5556eb261fd28e9a452d120c154ca1c037d94f023d5ab9&reaction=like'>👍</a> | <a href='https://app.codeant.ai/feedback?pr_url=https%3A%2F%2Fgithub.com%2FBizionic-Tech%2Fearnon%2Fpull%2F113&comment_hash=c2ff8eda8d955775ae5556eb261fd28e9a452d120c154ca1c037d94f023d5ab9&reaction=dislike'>👎</a>",
+   "diff_hunk": "@@ -122,6 +122,16 @@ public function getScoreThreshold(): float\n             return $this->clampThreshold((float) $raw);\n         }\n \n+        $legacyEnv = env('RECAPTCHA_ENTERPRISE_SCORE_THRESHOLD');\n+        if ($legacyEnv !== null && is_numeric($legacyEnv)) {\n+            return $this->clampThreshold((float) $legacyEnv);\n+        }\n+\n+        $servicesThreshold = config('services.recaptcha.threshold');\n+        if ($servicesThreshold !== null && is_numeric($servicesThreshold)) {\n+            return $this->clampThreshold((float) $servicesThreshold);",
+   "url": "https://github.com/Bizionic-Tech/earnon/pull/113#discussion_r4440002062",
+   "bot": "codeant-ai[bot]",
+   "created_at": "2026-11-02T07:56:27Z",
+   "updated_at": "2026-11-02T07:56:27Z",
+   "replies": [],
+   "removed": false,
+   "author": {
+    "email": "ajaruddin@bizionictech.com",
+    "name": "Ajaruddin",
+    "sha": "6655745111ae59045ecd2c4db198bacd0b7f9924",
+    "date": "2026-10-31T10:03:25Z",
+    "usable": true,
+    "source": "file"
+   }
+  }
+ ],
+ "sections": [
+  {
+   "kind": "status",
+   "title": "Review status",
+   "body": "## <a href=\"https://codeant.ai/\" title=\"CodeAnt AI\"><img src=\"https://new-codeant-butcket.s3.us-west-1.amazonaws.com/badges/codeant-block-purple-v2.svg\" width=\"28\" height=\"28\" align=\"absmiddle\" style=\"vertical-align:middle\" alt=\"CodeAnt\" /></a>&nbsp; CodeAnt Review Status\n\n**✅&nbsp; Review completed**\n\n| Status | Commit | Started (UTC) | Finished (UTC) |\n| --- | --- | --- | --- |\n| ✅&nbsp; `#f637d` Reviewed your PR | `1bdc1c2` | Nov 02, 2026 · 07:45 | 07:56 |\n\n<!-- codeant-review-status:[{\"run_id\":\"f637d6e7a341\",\"label\":\"Reviewed your PR\",\"commit\":\"1bdc1c2abc0b87b7230a11b5641c2fff21f3e14c\",\"started\":\"2026-11-02T07:45:30.045297\",\"finished\":\"2026-11-02T07:56:32.918525\",\"done\":true}] -->",
+   "url": "https://github.com/Bizionic-Tech/earnon/pull/113#issuecomment-6571835635",
+   "created_at": "2026-11-02T07:45:30Z",
+   "status_line": "Status: ✅&nbsp; #f637d Reviewed your PR  |  Commit: 1bdc1c2  |  Started (UTC): Nov 02, 2026 · 07:45  |  Finished (UTC): 07:56"
+  },
+  {
+   "kind": "quality",
+   "title": "Quality gate",
+   "body": "## <a href=\"https://app.codeant.ai/quality-gates/results?repo=Bizionic-Tech/earnon&amp;commit_id=1bdc1c2abc0b87b7230a11b5641c2fff21f3e14c&amp;service=github\"><img src=\"https://new-codeant-butcket.s3.us-west-1.amazonaws.com/badges/view-results-purple-v2.svg\" align=\"right\" alt=\"View results\" /></a> <a href=\"https://codeant.ai/\" title=\"CodeAnt AI\"><img src=\"https://new-codeant-butcket.s3.us-west-1.amazonaws.com/badges/codeant-block-purple-v2.svg\" width=\"28\" height=\"28\" align=\"absmiddle\" style=\"vertical-align:middle\" alt=\"CodeAnt\" /></a>&nbsp; CodeAnt Quality Gate Results\n\n<sub>Commit <code>1bdc1c2a</code> · Scanned Nov 02, 2026 at 07:57 UTC</sub>\n\n✅&nbsp; **Overall Status: PASSED**\n\n| Quality Gate | Status | Details |\n|:-------------|:------:|:--------|\n| **New code coverage** | ℹ️&nbsp; Not applicable | No coverage data found for the commit |\n| **Secrets** | ✅&nbsp; Passed | 0 secrets found, 3 false positive secrets suppressed |\n| **Duplicate code** | ✅&nbsp; Passed | 0.0% duplicated |\n| **SAST** | ✅&nbsp; Passed | No security issues |\n| **Bugs** | ✅&nbsp; Passed | Rating B · 1 bugs (1 medium) |\n| **IaC** | ✅&nbsp; Passed | No IAC issues |",
+   "url": "https://github.com/Bizionic-Tech/earnon/pull/113#issuecomment-6571868403",
+   "created_at": "2026-11-02T07:47:22Z"
+  },
+  {
+   "kind": "coverage",
+   "title": "Coverage",
+   "body": "# :bar_chart: CodeAnt Coverage Report\n\n**Commit:** `1bdc1c2a`\n**Scan Time:** 2026-11-02 07:47:22 UTC\n\n## :information_source: Status: Not applicable\n\n## Coverage Metrics\n\n| Metric | Value | Status |\n|--------|-------|--------|\n| **New Code Coverage** | No coverage data found for the commit | :information_source: Not applicable |\n\nNew-code coverage threshold not configured; coverage is reported but not enforced.\n\nOverall coverage is informational; no total-coverage threshold is enforced.\n\n### Details\n**New Code Coverage:** No coverage data found for the commit\n\n[View Coverage Report](https://app.codeant.ai/pr/analysis/coverage/test-coverage/?repo=Bizionic-Tech/earnon&module=&commit_id=1bdc1c2abc0b87b7230a11b5641c2fff21f3e14c&service=github)\n",
+   "url": "https://github.com/Bizionic-Tech/earnon/pull/113#issuecomment-6571868819",
+   "created_at": "2026-11-02T07:47:23Z"
+  },
+  {
+   "kind": "comment",
+   "title": "Comment",
+   "body": "## <a href=\"https://codeant.ai/\" title=\"CodeAnt AI\"><img src=\"https://new-codeant-butcket.s3.us-west-1.amazonaws.com/badges/codeant-block-purple-v2.svg\" width=\"28\" height=\"28\" align=\"absmiddle\" style=\"vertical-align:middle\" alt=\"CodeAnt\" /></a>&nbsp; CodeAnt Nitpicks\n\n<!-- codeant-nitpicks:pr_code_suggestions:start -->\n<details>\n<summary><strong>2 code suggestions</strong></summary>\n\n#### 1. Each failure restarts the 15-minute expiry, so attempts spaced less than 15 minutes apart can accumulate over a much longer period and trigger the threshold incorrectly.\n\nLogic error · [`app/Services/AuthenticationService.php:25`](https://github.com/Bizionic-Tech/earnon/pull/113/files#diff-78e0a5e3303f705d74ecacf205e82b4171504f5aaeb7caab7c554e22e14f28f8R25-R25)\n\n---\n\n#### 2. With the default MySQL case-insensitive collation, differently cased emails identify the same account, but this key splits their failures and lets attempts evade the threshold.\n\nSecurity · [`app/Services/AuthenticationService.php:52`](https://github.com/Bizionic-Tech/earnon/pull/113/files#diff-78e0a5e3303f705d74ecacf205e82b4171504f5aaeb7caab7c554e22e14f28f8R52-R52)\n\n</details>\n<!-- codeant-nitpicks:pr_code_suggestions:end -->\n\n---\n\n<!-- codeant-nitpicks:pr_custom_suggestions:start -->\n<details>\n<summary><strong>2 custom suggestions</strong></summary>\n\n#### 1. Move the reCAPTCHA annotation and after-response dispatch into an application service, leaving the controller to invoke that service; this also avoids duplicating the annotation workflow performed by the 2FA controller.\n\nCustom_rule · [`app/Http/Controllers/Api/AuthController.php:498-506`](https://github.com/Bizionic-Tech/earnon/pull/113/files#diff-ad6f5ce68221913af0e24dc74b618133cc1f3d1637f388a6bb3f9fe5f31947e0R498-R506)\n\n---\n\n#### 2. Pass the validated account identifier into the service and avoid reading email or username directly from the HTTP request.\n\nCustom_rule · [`app/Services/CaptchaService.php:398`](https://github.com/Bizionic-Tech/earnon/pull/113/files#diff-1c2ff23ea8a6a9281dd728c5b55dc0bec2c820f0bf1d62bcaf0f641f31427307R398-R398)\n\n</details>\n<!-- codeant-nitpicks:pr_custom_suggestions:end -->",
+   "url": "https://github.com/Bizionic-Tech/earnon/pull/113#issuecomment-6571871553",
+   "created_at": "2026-11-02T07:47:32Z"
+  },
+  {
+   "kind": "comment",
+   "title": "Comment",
+   "body": "## <a href=\"https://codeant.ai/\" title=\"CodeAnt AI\"><img src=\"https://new-codeant-butcket.s3.us-west-1.amazonaws.com/badges/codeant-block-purple-v2.svg\" width=\"28\" height=\"28\" align=\"absmiddle\" style=\"vertical-align:middle\" alt=\"CodeAnt\" /></a>&nbsp; CodeAnt PR Risk\n\n**🟡&nbsp; Medium Risk**\n\n- The PR needs attention before merging because concurrent failed logins can lose increments and delay fraudulent-attempt classification.\n- The default services threshold takes precedence over the existing CAPTCHA threshold, potentially changing enforcement for configured deployments.\n\n**Assessed commit:** `1bdc1c2abc0b`",
+   "url": "https://github.com/Bizionic-Tech/earnon/pull/113#issuecomment-6572029698",
+   "created_at": "2026-11-02T07:57:18Z"
+  }
+ ],
+ "slack": {
+  "at": "2026-11-02T13:57:56+05:30",
+  "delivered": false,
+  "how": null,
+  "error": "No Slack destination configured (report saved only).",
+  "link": "http://127.0.0.1:5000/reports/earnon-pr113-20261102-135752.html"
+ },
+ "updated_at": "2026-11-02T13:57:56+05:30",
+ "summary": {
+  "total": 2,
+  "by_severity": {
+   "Critical": 1,
+   "Major": 1,
+   "Medium": 0,
+   "Minor": 0,
+   "Info": 0
+  },
+  "files": 2,
+  "jira": 0
+ },
+ "finished_at": "2026-11-02T13:57:56+05:30"
+}

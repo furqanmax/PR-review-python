@@ -1,0 +1,24 @@
+# Local Keycloak for development / testing the portal login.
+#
+#   docker compose -f docker-compose.keycloak.yml up -d      # http://localhost:8180  (admin console: admin / admin)
+#   python3 seed.py --keycloak --write-env                   # realm, client, roles and the first admins
+#
+# Data is kept in the "keycloak-data" volume. For production, run Keycloak with a real database and HTTPS.
+services:
+  keycloak:
+    image: quay.io/keycloak/keycloak:25.0.1
+    container_name: pr-review-keycloak
+    command: start-dev
+    environment:
+      KEYCLOAK_ADMIN: ${KEYCLOAK_ADMIN_USER:-admin}                    # Keycloak 25 and older
+      KEYCLOAK_ADMIN_PASSWORD: ${KEYCLOAK_ADMIN_PASSWORD:-admin}
+      KC_BOOTSTRAP_ADMIN_USERNAME: ${KEYCLOAK_ADMIN_USER:-admin}       # Keycloak 26 and newer
+      KC_BOOTSTRAP_ADMIN_PASSWORD: ${KEYCLOAK_ADMIN_PASSWORD:-admin}
+    ports:
+      - "8180:8080"
+    volumes:
+      - keycloak-data:/opt/keycloak/data
+    restart: unless-stopped
+
+volumes:
+  keycloak-data:

@@ -1,0 +1,183 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Review report · earnon #113</title>
+<style>
+:root{--bg:#f5f6f8;--card:#fff;--fg:#1b2130;--muted:#677084;--line:#e2e5ea;--accent:#4f46e5;--code:#f2f3f6;
+--crit:#dc2626;--major:#ea580c;--medium:#ca8a04;--minor:#2563eb;--info:#64748b;--add:#e6f6ea;--del:#fdecec;--addf:#166534;--delf:#991b1b}
+@media (prefers-color-scheme:dark){:root{--bg:#0e1117;--card:#161b24;--fg:#e5e8ee;--muted:#9aa3b5;--line:#272e3a;--accent:#818cf8;--code:#0f141c;
+--crit:#f87171;--major:#fb923c;--medium:#facc15;--minor:#60a5fa;--info:#94a3b8;--add:#11291a;--del:#2c1414;--addf:#86efac;--delf:#fca5a5}}
+*{box-sizing:border-box}body{margin:0;background:var(--bg);color:var(--fg);font:14px/1.55 system-ui,-apple-system,"Segoe UI",Roboto,sans-serif}
+a{color:var(--accent)}code{font-family:ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;font-size:12.5px;background:var(--code);padding:1px 5px;border-radius:5px}
+.wrap{max-width:1100px;margin:auto;padding:0 16px 40px}
+header{background:linear-gradient(135deg,#4f46e5,#7c3aed);color:#fff;padding:28px 0 72px}
+header .wrap{padding-bottom:0}header h1{margin:0 0 4px;font-size:24px}header p{margin:0;opacity:.9}header a{color:#fff}
+.badge{display:inline-block;margin-top:10px;padding:3px 10px;border-radius:20px;background:rgba(255,255,255,.18);font-size:12px}
+.cards{display:grid;grid-template-columns:repeat(auto-fit,minmax(110px,1fr));gap:10px;margin-top:-52px}
+.card{background:var(--card);border:1px solid var(--line);border-radius:12px;padding:12px 14px;box-shadow:0 2px 8px rgba(0,0,0,.05)}
+.card .n{font-size:24px;font-weight:700}.card .l{color:var(--muted);font-size:12px}
+.card.crit .n{color:var(--crit)}.card.major .n{color:var(--major)}.card.medium .n{color:var(--medium)}.card.minor .n{color:var(--minor)}.card.info .n{color:var(--info)}.card.total .n{color:var(--accent)}
+.banner{margin:16px 0 0;padding:10px 14px;border-radius:10px;background:color-mix(in srgb,var(--major) 14%,transparent);border:1px solid color-mix(in srgb,var(--major) 40%,transparent)}
+h2{font-size:18px;margin:28px 0 12px}h3{font-size:15px;margin:0 0 10px}h5{font-size:14px;margin:12px 0 6px}
+.panel{background:var(--card);border:1px solid var(--line);border-radius:12px;padding:16px;margin-bottom:14px}
+.toolbar{display:flex;gap:8px;flex-wrap:wrap;align-items:center;margin-bottom:12px}
+.fchip{border:1px solid var(--line);background:var(--card);color:var(--fg);padding:4px 12px;border-radius:20px;cursor:pointer;font:inherit;font-size:12.5px}
+.fchip.on{background:var(--accent);border-color:var(--accent);color:#fff}
+#q{flex:1;min-width:180px;padding:7px 12px;border:1px solid var(--line);border-radius:20px;background:var(--card);color:var(--fg);font:inherit}
+.issue{background:var(--card);border:1px solid var(--line);border-left:4px solid var(--info);border-radius:10px;padding:14px 16px;margin-bottom:12px}
+.issue.sev-crit{border-left-color:var(--crit)}.issue.sev-major{border-left-color:var(--major)}.issue.sev-medium{border-left-color:var(--medium)}.issue.sev-minor{border-left-color:var(--minor)}
+.ihead{display:flex;gap:6px;flex-wrap:wrap;align-items:center}.num{color:var(--muted);font-weight:600;margin-right:2px}
+.pill{padding:2px 9px;border-radius:20px;font-size:12px;font-weight:600;color:#fff;background:var(--info)}
+.pill.crit{background:var(--crit)}.pill.major{background:var(--major)}.pill.medium{background:var(--medium);color:#1b1b1b}.pill.minor{background:var(--minor)}
+.chip{padding:2px 8px;border-radius:20px;font-size:12px;border:1px solid var(--line);color:var(--muted)}
+.flag{padding:1px 7px;border-radius:20px;font-size:11px;background:var(--code);color:var(--muted)}.flag.gone{color:var(--crit)}
+.loc{word-break:break-all}.sugg{margin:10px 0 8px;font-size:14.5px}
+.meta{display:flex;gap:10px;flex-wrap:wrap;color:var(--fg);font-size:12.5px;align-items:center}.grow{flex:1}.muted{color:var(--muted)}
+details.box{margin-top:10px;border:1px solid var(--line);border-radius:8px;padding:6px 10px;position:relative}
+details.box summary{cursor:pointer;color:var(--muted);font-size:12.5px;font-weight:600}
+pre{background:var(--code);border-radius:8px;padding:10px;overflow:auto;white-space:pre-wrap;word-break:break-word;font-size:12.5px}
+pre code{background:none;padding:0}
+.diff span{display:block}.diff .add{background:var(--add);color:var(--addf)}.diff .del{background:var(--del);color:var(--delf)}.diff .hdr{color:var(--muted)}
+.copy{position:absolute;right:10px;top:6px;font:inherit;font-size:12px;border:1px solid var(--line);background:var(--card);color:var(--fg);border-radius:6px;padding:2px 10px;cursor:pointer}
+.tbl{overflow:auto}table{border-collapse:collapse;width:100%;font-size:13px}th,td{text-align:left;padding:7px 8px;border-bottom:1px solid var(--line);vertical-align:top}
+.kv th{width:190px;color:var(--muted);font-weight:500}.md p{margin:6px 0}.reply{border-top:1px dashed var(--line);margin-top:8px}
+.empty{padding:28px;text-align:center;color:var(--muted);background:var(--card);border:1px dashed var(--line);border-radius:12px}
+.small{font-size:12px;font-weight:400}footer{color:var(--muted);font-size:12px;text-align:center;margin-top:30px}
+@media print{header{background:#4f46e5 !important;-webkit-print-color-adjust:exact}.toolbar,.copy{display:none}details{display:block}}
+</style></head>
+<body>
+<header><div class="wrap">
+  <h1>Code Review Report</h1>
+  <p>Bizionic-Tech/earnon · <a href="https://github.com/Bizionic-Tech/earnon/pull/113" target="_blank" rel="noopener noreferrer">PR #113</a> · Email update: threshold-manage-email-fix-20261102-131520</p>
+  <span class="badge">✅ Review finished</span>
+  <span class="badge">Generated 2026-11-02 13:57</span>
+</div></header>
+<main class="wrap">
+  <div class="cards"><div class="card total"><div class="n">2</div><div class="l">Issues</div></div><div class="card crit"><div class="n">1</div><div class="l">Critical</div></div><div class="card major"><div class="n">1</div><div class="l">Major</div></div><div class="card medium"><div class="n">0</div><div class="l">Medium</div></div><div class="card minor"><div class="n">0</div><div class="l">Minor</div></div><div class="card info"><div class="n">0</div><div class="l">Info</div></div><div class="card plain"><div class="n">2</div><div class="l">Files</div></div><div class="card plain"><div class="n">5</div><div class="l">Commits</div></div></div>
+  
+  <h2>Issues</h2>
+  <div class="toolbar"><button class="fchip on" data-f="all" type="button">All</button><button class="fchip crit" data-f="Critical" type="button">Critical (1)</button><button class="fchip major" data-f="Major" type="button">Major (1)</button><input id="q" type="search" placeholder="Search file, text, author..." aria-label="Search issues"></div>
+  <div id="issues"><article class="issue sev-crit" data-sev="Critical" data-search="critical custom rule security app/services/authenticationservice.php use an atomic cache increment with the 15-minute expiry so concurrent failed-login requests cannot overwrite each other’s counts. ajaruddin@bizionictech.com ajaruddin">
+  <div class="ihead"><span class="num">#1</span><span class="pill crit">Critical</span><span class="chip">Custom rule security</span><code class="loc">app/Services/AuthenticationService.php:24-25</code></div>
+  <p class="sugg">Use an atomic cache increment with the 15-minute expiry so concurrent failed-login requests cannot overwrite each other’s counts.</p>
+  <div class="meta"><span>👤 Ajaruddin &lt;ajaruddin@bizionictech.com&gt;</span><span class="muted">(last commit that changed this file)</span><span></span><span class="grow"></span><a href="https://github.com/Bizionic-Tech/earnon/pull/113#discussion_r4439941785" target="_blank" rel="noopener noreferrer">View on GitHub ↗</a></div>
+  <details class="box"><summary>🤖 Prompt for AI agent</summary><button class="copy" type="button" data-copy="p1">Copy</button><pre id="p1"><code>This is a comment left during a code review.
+
+**Path:** app/Services/AuthenticationService.php
+**Line:** 24:25
+**Comment:**
+	*Custom Rule Security: Use an atomic cache increment with the 15-minute expiry so concurrent failed-login requests cannot overwrite each other’s counts.
+
+Validate the correctness of the flagged issue. If correct, How can I resolve this? If you propose a fix, implement it and please make it concise.
+Once fix is implemented, also check other comments on the same PR, and ask user if the user wants to fix the rest of the comments as well. if said yes, then fetch all the comments validate the correctness and implement a minimal fix</code></pre></details><details class="box"><summary>Code context</summary><pre class="diff"><code><span class="hdr">@@ -0,0 +1,54 @@</span>
+<span class="add">+&lt;?php</span>
+<span class="add">+</span>
+<span class="add">+namespace App\Services;</span>
+<span class="add">+</span>
+<span class="add">+use Illuminate\Support\Facades\Cache;</span>
+<span class="add">+</span>
+<span class="add">+class AuthenticationService</span>
+<span class="add">+{</span>
+<span class="add">+    public const FAILED_ATTEMPTS_THRESHOLD = 3;</span>
+<span class="add">+    public const FAILED_ATTEMPTS_TTL_MINUTES = 15;</span>
+<span class="add">+</span>
+<span class="add">+    public function __construct(</span>
+<span class="add">+        protected ?RecaptchaEnterpriseService $recaptchaEnterpriseService = null</span>
+<span class="add">+    ) {</span>
+<span class="add">+        $this-&gt;recaptchaEnterpriseService = $recaptchaEnterpriseService ?? app(RecaptchaEnterpriseService::class);</span>
+<span class="add">+    }</span>
+<span class="add">+</span>
+<span class="add">+    /**</span>
+<span class="add">+     * Record a failed login attempt, increment counter, and classify as fraudulent if threshold reached.</span>
+<span class="add">+     */</span>
+<span class="add">+    public function recordFailedLogin(string $email, string $ip, ?string $assessmentName = null): int</span>
+<span class="add">+    {</span>
+<span class="add">+        $cacheKey = $this-&gt;getFailedAttemptsCacheKey($email, $ip);</span>
+<span class="add">+        $attempts = (int) Cache::get($cacheKey, 0) + 1;</span>
+<span class="add">+        Cache::put($cacheKey, $attempts, now()-&gt;addMinutes(self::FAILED_ATTEMPTS_TTL_MINUTES));</span></code></pre></details><details class="box"><summary>Full comment</summary><div class="md"><p><strong>Suggestion:</strong> Use an atomic cache increment with the 15-minute expiry so concurrent failed-login requests cannot overwrite each other’s counts.</p>
+<p><strong>Severity Level:</strong> Critical 🚨 · 🏷️ <code>Custom_rule_security</code></p>
+<p><strong>Rule source 📖</strong></p>
+<p>CodeAnt dashboard (rule &quot;rules-1790680420739-jowv2yvv2&quot;)</p></div></details>
+</article>
+<article class="issue sev-major" data-sev="Major" data-search="major logic error app/services/recaptchaenterpriseservice.php the default numeric services threshold is returned before the captcha threshold, so deployments using the existing captcha setting can silently enforce a different score. ajaruddin@bizionictech.com ajaruddin">
+  <div class="ihead"><span class="num">#2</span><span class="pill major">Major</span><span class="chip">Logic error</span><span class="chip">Occurrence: Sometimes</span><code class="loc">app/Services/RecaptchaEnterpriseService.php:130-132</code></div>
+  <p class="sugg">The default numeric services threshold is returned before the captcha threshold, so deployments using the existing captcha setting can silently enforce a different score.</p>
+  <div class="meta"><span>👤 Ajaruddin &lt;ajaruddin@bizionictech.com&gt;</span><span class="muted">(last commit that changed this file)</span><span></span><span class="grow"></span><a href="https://github.com/Bizionic-Tech/earnon/pull/113#discussion_r4440002062" target="_blank" rel="noopener noreferrer">View on GitHub ↗</a></div>
+  <details class="box"><summary>🤖 Prompt for AI agent</summary><button class="copy" type="button" data-copy="p2">Copy</button><pre id="p2"><code>This is a comment left during a code review.
+
+**Path:** app/Services/RecaptchaEnterpriseService.php
+**Line:** 130:132
+**Comment:**
+	*Logic Error: The default numeric services threshold is returned before the captcha threshold, so deployments using the existing captcha setting can silently enforce a different score.
+
+Validate the correctness of the flagged issue. If correct, How can I resolve this? If you propose a fix, implement it and please make it concise.
+Once fix is implemented, also check other comments on the same PR, and ask user if the user wants to fix the rest of the comments as well. if said yes, then fetch all the comments validate the correctness and implement a minimal fix</code></pre></details><details class="box"><summary>Code context</summary><pre class="diff"><code><span class="hdr">@@ -122,6 +122,16 @@ public function getScoreThreshold(): float</span>
+<span class="">             return $this-&gt;clampThreshold((float) $raw);</span>
+<span class="">         }</span>
+<span class=""> </span>
+<span class="add">+        $legacyEnv = env(&#x27;RECAPTCHA_ENTERPRISE_SCORE_THRESHOLD&#x27;);</span>
+<span class="add">+        if ($legacyEnv !== null &amp;&amp; is_numeric($legacyEnv)) {</span>
+<span class="add">+            return $this-&gt;clampThreshold((float) $legacyEnv);</span>
+<span class="add">+        }</span>
+<span class="add">+</span>
+<span class="add">+        $servicesThreshold = config(&#x27;services.recaptcha.threshold&#x27;);</span>
+<span class="add">+        if ($servicesThreshold !== null &amp;&amp; is_numeric($servicesThreshold)) {</span>
+<span class="add">+            return $this-&gt;clampThreshold((float) $servicesThreshold);</span></code></pre></details><details class="box"><summary>Full comment</summary><div class="md"><p><strong>Suggestion:</strong> The default numeric services threshold is returned before the captcha threshold, so deployments using the existing captcha setting can silently enforce a different score.</p>
+<p><strong>Assessment:</strong> 🟠 <code>Major</code> · 🔁 <code>Occurrence: Sometimes</code> · 🏷️ <code>Logic error</code></p></div></details>
+</article></div>
+  <h2>Pull request &amp; branches</h2>
+  <section class="panel"><div class="tbl"><table class="kv"><tr><th>Repository</th><td>Bizionic-Tech/earnon</td></tr><tr><th>Pull request</th><td><a href="https://github.com/Bizionic-Tech/earnon/pull/113" target="_blank" rel="noopener noreferrer">#113 Email update: threshold-manage-email-fix-20261102-131520</a></td></tr><tr><th>PR branches</th><td><code>threshold-manage-email-fix-20261102-131520</code> → <code>dev-20261102-131520</code></td></tr><tr><th>PR state</th><td>open</td></tr><tr><th>Original branch</th><td><code>threshold-manage</code></td></tr><tr><th>Report status</th><td>Review finished</td></tr><tr><th>Started</th><td>2026-11-02 13:57</td></tr><tr><th>Finished</th><td>2026-11-02 13:57</td></tr><tr><th>Author source</th><td>original branch (found from the PR branch name)</td></tr></table></div></section>
+  <h2>Commits &amp; original authors</h2>
+  <section class="panel"><div class="tbl"><table><thead><tr><th>Commit</th><th>Message</th><th>Author</th><th>Original email</th><th>Date (UTC)</th></tr></thead><tbody><tr><td><code>f887526</code></td><td>threshold manage</td><td>Ajaruddin</td><td><code>ajaruddin@bizionictech.com</code></td><td>2026-10-30 12:40</td></tr><tr><td><code>60a9ba0</code></td><td>Merge branch &#x27;dev&#x27; of https://git-codecommit.ap-south-1.amazonaws.com/v1/repos/earnon into threshold-manage</td><td>Ajaruddin</td><td><code>ajaruddin@bizionictech.com</code></td><td>2026-10-31 05:40</td></tr><tr><td><code>fb13cc8</code></td><td>Refactor reCAPTCHA Enterprise verification, event context, and assessment annotations with optional 2FA login workflow</td><td>Ajaruddin</td><td><code>ajaruddin@bizionictech.com</code></td><td>2026-10-31 06:54</td></tr><tr><td><code>b947530</code></td><td>Address PR review comments: harden assessment annotation security, fix Cache import and threshold precedence</td><td>Ajaruddin</td><td><code>ajaruddin@bizionictech.com</code></td><td>2026-10-31 07:52</td></tr><tr><td><code>6655745</code></td><td>threshold manage</td><td>Ajaruddin</td><td><code>ajaruddin@bizionictech.com</code></td><td>2026-10-31 10:03</td></tr></tbody></table></div></section>
+  <h2>Review status &amp; quality</h2><section class="panel"><h3>Review status <a class=small href="https://github.com/Bizionic-Tech/earnon/pull/113#issuecomment-6571835635" target=_blank rel="noopener noreferrer">open ↗</a></h3><div class="md"><h5><a href="https://codeant.ai/" target="_blank" rel="noopener noreferrer">link</a>  CodeAnt Review Status</h5>
+<p><strong>✅  Review completed</strong></p>
+<div class="tbl"><table><thead><tr><th>Status</th><th>Commit</th><th>Started (UTC)</th><th>Finished (UTC)</th></tr></thead><tbody><tr><td>✅  <code>#f637d</code> Reviewed your PR</td><td><code>1bdc1c2</code></td><td>Nov 02, 2026 · 07:45</td><td>07:56</td></tr></tbody></table></div></div></section><section class="panel"><h3>Quality gate <a class=small href="https://github.com/Bizionic-Tech/earnon/pull/113#issuecomment-6571868403" target=_blank rel="noopener noreferrer">open ↗</a></h3><div class="md"><h5><a href="https://app.codeant.ai/quality-gates/results?repo=Bizionic-Tech/earnon&amp;commit_id=1bdc1c2abc0b87b7230a11b5641c2fff21f3e14c&amp;service=github" target="_blank" rel="noopener noreferrer">link</a> <a href="https://codeant.ai/" target="_blank" rel="noopener noreferrer">link</a>  CodeAnt Quality Gate Results</h5>
+<p>Commit 1bdc1c2a · Scanned Nov 02, 2026 at 07:57 UTC</p>
+<p>✅  <strong>Overall Status: PASSED</strong></p>
+<div class="tbl"><table><thead><tr><th>Quality Gate</th><th>Status</th><th>Details</th></tr></thead><tbody><tr><td><strong>New code coverage</strong></td><td>ℹ️  Not applicable</td><td>No coverage data found for the commit</td></tr><tr><td><strong>Secrets</strong></td><td>✅  Passed</td><td>0 secrets found, 3 false positive secrets suppressed</td></tr><tr><td><strong>Duplicate code</strong></td><td>✅  Passed</td><td>0.0% duplicated</td></tr><tr><td><strong>SAST</strong></td><td>✅  Passed</td><td>No security issues</td></tr><tr><td><strong>Bugs</strong></td><td>✅  Passed</td><td>Rating B · 1 bugs (1 medium)</td></tr><tr><td><strong>IaC</strong></td><td>✅  Passed</td><td>No IAC issues</td></tr></tbody></table></div></div></section><section class="panel"><h3>Coverage <a class=small href="https://github.com/Bizionic-Tech/earnon/pull/113#issuecomment-6571868819" target=_blank rel="noopener noreferrer">open ↗</a></h3><div class="md"><h5>📊 CodeAnt Coverage Report</h5>
+<p><strong>Commit:</strong> <code>1bdc1c2a</code><br><strong>Scan Time:</strong> 2026-11-02 07:47:22 UTC</p>
+<h5>ℹ️ Status: Not applicable</h5>
+<h5>Coverage Metrics</h5>
+<div class="tbl"><table><thead><tr><th>Metric</th><th>Value</th><th>Status</th></tr></thead><tbody><tr><td><strong>New Code Coverage</strong></td><td>No coverage data found for the commit</td><td>ℹ️ Not applicable</td></tr></tbody></table></div>
+<p>New-code coverage threshold not configured; coverage is reported but not enforced.</p>
+<p>Overall coverage is informational; no total-coverage threshold is enforced.</p>
+<h5>Details</h5>
+<p><strong>New Code Coverage:</strong> No coverage data found for the commit</p>
+<p><a href="https://app.codeant.ai/pr/analysis/coverage/test-coverage/?repo=Bizionic-Tech/earnon&amp;module=&amp;commit_id=1bdc1c2abc0b87b7230a11b5641c2fff21f3e14c&amp;service=github" target="_blank" rel="noopener noreferrer">View Coverage Report</a></p></div></section><section class="panel"><h3>Comment <a class=small href="https://github.com/Bizionic-Tech/earnon/pull/113#issuecomment-6571871553" target=_blank rel="noopener noreferrer">open ↗</a></h3><div class="md"><h5><a href="https://codeant.ai/" target="_blank" rel="noopener noreferrer">link</a>  CodeAnt Nitpicks</h5>
+<p><strong>2 code suggestions</strong></p>
+<h5>1. Each failure restarts the 15-minute expiry, so attempts spaced less than 15 minutes apart can accumulate over a much longer period and trigger the threshold incorrectly.</h5>
+<p>Logic error · <a href="https://github.com/Bizionic-Tech/earnon/pull/113/files#diff-78e0a5e3303f705d74ecacf205e82b4171504f5aaeb7caab7c554e22e14f28f8R25-R25" target="_blank" rel="noopener noreferrer"><code>app/Services/AuthenticationService.php:25</code></a></p>
+<p>---</p>
+<h5>2. With the default MySQL case-insensitive collation, differently cased emails identify the same account, but this key splits their failures and lets attempts evade the threshold.</h5>
+<p>Security · <a href="https://github.com/Bizionic-Tech/earnon/pull/113/files#diff-78e0a5e3303f705d74ecacf205e82b4171504f5aaeb7caab7c554e22e14f28f8R52-R52" target="_blank" rel="noopener noreferrer"><code>app/Services/AuthenticationService.php:52</code></a></p>
+<p>---</p>
+<p><strong>2 custom suggestions</strong></p>
+<h5>1. Move the reCAPTCHA annotation and after-response dispatch into an application service, leaving the controller to invoke that service; this also avoids duplicating the annotation workflow performed by the 2FA controller.</h5>
+<p>Custom_rule · <a href="https://github.com/Bizionic-Tech/earnon/pull/113/files#diff-ad6f5ce68221913af0e24dc74b618133cc1f3d1637f388a6bb3f9fe5f31947e0R498-R506" target="_blank" rel="noopener noreferrer"><code>app/Http/Controllers/Api/AuthController.php:498-506</code></a></p>
+<p>---</p>
+<h5>2. Pass the validated account identifier into the service and avoid reading email or username directly from the HTTP request.</h5>
+<p>Custom_rule · <a href="https://github.com/Bizionic-Tech/earnon/pull/113/files#diff-1c2ff23ea8a6a9281dd728c5b55dc0bec2c820f0bf1d62bcaf0f641f31427307R398-R398" target="_blank" rel="noopener noreferrer"><code>app/Services/CaptchaService.php:398</code></a></p></div></section><section class="panel"><h3>Comment <a class=small href="https://github.com/Bizionic-Tech/earnon/pull/113#issuecomment-6572029698" target=_blank rel="noopener noreferrer">open ↗</a></h3><div class="md"><h5><a href="https://codeant.ai/" target="_blank" rel="noopener noreferrer">link</a>  CodeAnt PR Risk</h5>
+<p><strong>🟡  Medium Risk</strong></p>
+<ul><li>The PR needs attention before merging because concurrent failed logins can lose increments and delay fraudulent-attempt classification.</li><li>The default services threshold takes precedence over the existing CAPTCHA threshold, potentially changing enforcement for configured deployments.</li></ul>
+<p><strong>Assessed commit:</strong> <code>1bdc1c2abc0b</code></p></div></section>
+  <footer>Report earnon-pr113-20261102-135752</footer>
+</main>
+<script>
+(function(){
+  var f="all", q=document.getElementById("q");
+  function apply(){var t=(q&&q.value||"").toLowerCase();
+    document.querySelectorAll(".issue").forEach(function(e){
+      var ok=(f==="all"||e.getAttribute("data-sev")===f)&&(!t||e.getAttribute("data-search").indexOf(t)>=0);
+      e.style.display=ok?"":"none";});}
+  document.querySelectorAll(".fchip").forEach(function(b){b.addEventListener("click",function(){
+    f=b.getAttribute("data-f");document.querySelectorAll(".fchip").forEach(function(x){x.classList.toggle("on",x===b);});apply();});});
+  if(q)q.addEventListener("input",apply);
+  document.querySelectorAll(".copy").forEach(function(b){b.addEventListener("click",function(){
+    var el=document.getElementById(b.getAttribute("data-copy")), txt=el?el.innerText:"";
+    function done(){b.textContent="Copied";setTimeout(function(){b.textContent="Copy";},1500);}
+    if(navigator.clipboard&&window.isSecureContext){navigator.clipboard.writeText(txt).then(done,fallback);}else fallback();
+    function fallback(){var ta=document.createElement("textarea");ta.value=txt;document.body.appendChild(ta);ta.select();
+      try{document.execCommand("copy");done();}catch(e){}document.body.removeChild(ta);}
+  });});
+})();
+</script>
+</body></html>

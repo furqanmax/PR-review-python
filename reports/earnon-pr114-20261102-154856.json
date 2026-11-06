@@ -1,0 +1,248 @@
+{
+ "id": "earnon-pr114-20261102-154856",
+ "version": 1,
+ "created_at": "2026-11-02T15:48:56+05:30",
+ "status": "stuck",
+ "pr": {
+  "owner": "Bizionic-Tech",
+  "repo": "earnon",
+  "number": 114,
+  "title": "Email update: meet-apis-email-fix-20261102-154850",
+  "url": "https://github.com/Bizionic-Tech/earnon/pull/114",
+  "head": "meet-apis-email-fix-20261102-154850",
+  "base": "dev-20261102-154850",
+  "state": "open",
+  "merged": false
+ },
+ "rewrite": {
+  "original_branch": "meet-apis",
+  "dev": "dev",
+  "new_email": "mohd@bizionictech.com",
+  "head": "meet-apis-email-fix-20261102-154850",
+  "base": "dev-20261102-154850",
+  "count": 1,
+  "rewritten": 1
+ },
+ "requester": null,
+ "mode": "html",
+ "commits": [
+  {
+   "sha": "e9672611296333cb9e931abcbafe702afc0bdcc8",
+   "short": "e967261",
+   "subject": "meets api",
+   "author_name": "Rajlaxmi",
+   "author_email": "rajlaxmi@bizionictech.com",
+   "author_date": "2026-11-02T10:13:11Z",
+   "committer_email": "rajlaxmi@bizionictech.com"
+  }
+ ],
+ "authors_source": "original",
+ "file_authors": {
+  "app/Http/Controllers/Api/BookingSettingsController.php": {
+   "email": "rajlaxmi@bizionictech.com",
+   "name": "Rajlaxmi",
+   "sha": "e9672611296333cb9e931abcbafe702afc0bdcc8",
+   "date": "2026-11-02T10:13:11Z",
+   "usable": true
+  },
+  "app/Http/Requests/StoreBookingRequest.php": {
+   "email": "rajlaxmi@bizionictech.com",
+   "name": "Rajlaxmi",
+   "sha": "e9672611296333cb9e931abcbafe702afc0bdcc8",
+   "date": "2026-11-02T10:13:11Z",
+   "usable": true
+  },
+  "app/Services/BookingSettingsService.php": {
+   "email": "rajlaxmi@bizionictech.com",
+   "name": "Rajlaxmi",
+   "sha": "e9672611296333cb9e931abcbafe702afc0bdcc8",
+   "date": "2026-11-02T10:13:11Z",
+   "usable": true
+  },
+  "routes/api.php": {
+   "email": "rajlaxmi@bizionictech.com",
+   "name": "Rajlaxmi",
+   "sha": "e9672611296333cb9e931abcbafe702afc0bdcc8",
+   "date": "2026-11-02T10:13:11Z",
+   "usable": true
+  }
+ },
+ "default_author": {
+  "email": "rajlaxmi@bizionictech.com",
+  "name": "Rajlaxmi",
+  "sha": "e9672611296333cb9e931abcbafe702afc0bdcc8",
+  "date": "2026-11-02T10:13:11Z",
+  "usable": true
+ },
+ "issues": [
+  {
+   "id": "c4441218351",
+   "gh_id": 4441218351,
+   "kind": "inline",
+   "path": "app/Services/BookingSettingsService.php",
+   "line": 2350,
+   "start_line": null,
+   "outdated": false,
+   "severity": "Critical",
+   "rank": 0,
+   "category": "Custom rule security",
+   "occurrence": null,
+   "suggestion": "Authorize the requester as the appointment’s booker or creator before exposing this snapshot; the appointment-details endpoint loads by ID without checking ownership, so authenticated users can retrieve another user’s meetup location and submitted details.",
+   "prompt": "This is a comment left during a code review.\n\n**Path:** app/Services/BookingSettingsService.php\n**Line:** 2350:2350\n**Comment:**\n\t*Custom Rule Security: Authorize the requester as the appointment’s booker or creator before exposing this snapshot; the appointment-details endpoint loads by ID without checking ownership, so authenticated users can retrieve another user’s meetup location and submitted details.\n\nValidate the correctness of the flagged issue. If correct, How can I resolve this? If you propose a fix, implement it and please make it concise.\nOnce fix is implemented, also check other comments on the same PR, and ask user if the user wants to fix the rest of the comments as well. if said yes, then fetch all the comments validate the correctness and implement a minimal fix",
+   "body": "**Suggestion:** Authorize the requester as the appointment’s booker or creator before exposing this snapshot; the appointment-details endpoint loads by ID without checking ownership, so authenticated users can retrieve another user’s meetup location and submitted details.\n\n**Severity Level:** Critical 🚨 · 🏷️ `Custom_rule_security`\n<details>\n<summary><b>Rule source 📖 </b></summary>\n\nCodeAnt dashboard (rule \"rules-1790680366773-dxon84tjo\")\n</details>\n\n[![Use CodeAnt Skill](https://new-codeant-butcket.s3.us-west-1.amazonaws.com/badges/use-codeant-skill-flat-v2.svg)](https://docs.codeant.ai/cli/resolve-pr-comments-skill) [![Fix in Cursor](https://new-codeant-butcket.s3.us-west-1.amazonaws.com/badges/fix-in-cursor-flat.svg)](https://app.codeant.ai/fix-in-ide?tool=cursor&prompt_id=6e5e293b75bf463cb7feb21e16373980&service=github&base_url=https%3A%2F%2Fgithub.com&org=Bizionic-Tech&repo=Bizionic-Tech%2Fearnon) [![Fix in VSCode Claude](https://new-codeant-butcket.s3.us-west-1.amazonaws.com/badges/fix-in-vscode-claude-flat.svg)](https://app.codeant.ai/fix-in-ide?tool=vscode-claude&prompt_id=6e5e293b75bf463cb7feb21e16373980&service=github&base_url=https%3A%2F%2Fgithub.com&org=Bizionic-Tech&repo=Bizionic-Tech%2Fearnon)\n<details>\n<summary><b>Prompt for AI Agent 🤖 </b></summary>\n\n```mdx\nThis is a comment left during a code review.\n\n**Path:** app/Services/BookingSettingsService.php\n**Line:** 2350:2350\n**Comment:**\n\t*Custom Rule Security: Authorize the requester as the appointment’s booker or creator before exposing this snapshot; the appointment-details endpoint loads by ID without checking ownership, so authenticated users can retrieve another user’s meetup location and submitted details.\n\nValidate the correctness of the flagged issue. If correct, How can I resolve this? If you propose a fix, implement it and please make it concise.\nOnce fix is implemented, also check other comments on the same PR, and ask user if the user wants to fix the rest of the comments as well. if said yes, then fetch all the comments validate the correctness and implement a minimal fix\n```\n</details>\n<a href='https://app.codeant.ai/feedback?pr_url=https%3A%2F%2Fgithub.com%2FBizionic-Tech%2Fearnon%2Fpull%2F114&comment_hash=bcec2dc43b798c2f573eddd652c40cdd1a8a34a4d3185198ff3a18c722417fde&reaction=like'>👍</a> | <a href='https://app.codeant.ai/feedback?pr_url=https%3A%2F%2Fgithub.com%2FBizionic-Tech%2Fearnon%2Fpull%2F114&comment_hash=bcec2dc43b798c2f573eddd652c40cdd1a8a34a4d3185198ff3a18c722417fde&reaction=dislike'>👎</a>",
+   "diff_hunk": "@@ -2325,6 +2346,9 @@ private function formatAppointmentResponse($appointment, $customer, $request = n\n                 'dispute' => $otherData['dispute'] ?? null,\r\n             ],\r\n \r\n+            // Meetup Booking: experience, meeting location, details and the creator's suggested time (proposal)\r\n+            'meetup' => $appointment->isMeetup() ? $appointment->meetupData() : null,\r",
+   "url": "https://github.com/Bizionic-Tech/earnon/pull/114#discussion_r4441218351",
+   "bot": "codeant-ai[bot]",
+   "created_at": "2026-11-02T10:21:51Z",
+   "updated_at": "2026-11-02T10:21:51Z",
+   "replies": [],
+   "removed": false,
+   "author": {
+    "email": "rajlaxmi@bizionictech.com",
+    "name": "Rajlaxmi",
+    "sha": "e9672611296333cb9e931abcbafe702afc0bdcc8",
+    "date": "2026-11-02T10:13:11Z",
+    "usable": true,
+    "source": "file"
+   }
+  },
+  {
+   "id": "c4441218298",
+   "gh_id": 4441218298,
+   "kind": "inline",
+   "path": "app/Http/Controllers/Api/BookingSettingsController.php",
+   "line": 937,
+   "start_line": null,
+   "outdated": false,
+   "severity": "Major",
+   "rank": 1,
+   "category": "Custom rule",
+   "occurrence": null,
+   "suggestion": "Batch blocked-date retrieval in the service and pass the results into slot generation; this call reaches a 28-day loop that queries blocked dates once for each open date.",
+   "prompt": "This is a comment left during a code review.\n\n**Path:** app/Http/Controllers/Api/BookingSettingsController.php\n**Line:** 937:937\n**Comment:**\n\t*Custom Rule: Batch blocked-date retrieval in the service and pass the results into slot generation; this call reaches a 28-day loop that queries blocked dates once for each open date.\n\nValidate the correctness of the flagged issue. If correct, How can I resolve this? If you propose a fix, implement it and please make it concise.\nOnce fix is implemented, also check other comments on the same PR, and ask user if the user wants to fix the rest of the comments as well. if said yes, then fetch all the comments validate the correctness and implement a minimal fix",
+   "body": "**Suggestion:** Batch blocked-date retrieval in the service and pass the results into slot generation; this call reaches a 28-day loop that queries blocked dates once for each open date.\n\n**Severity Level:** Major ⚠️ · 🏷️ `Custom_rule`\n<details>\n<summary><b>Rule source 📖 </b></summary>\n\nCodeAnt dashboard (rule \"rules-1791630715722-yoypjvtra\")\n</details>\n\n[![Use CodeAnt Skill](https://new-codeant-butcket.s3.us-west-1.amazonaws.com/badges/use-codeant-skill-flat-v2.svg)](https://docs.codeant.ai/cli/resolve-pr-comments-skill) [![Fix in Cursor](https://new-codeant-butcket.s3.us-west-1.amazonaws.com/badges/fix-in-cursor-flat.svg)](https://app.codeant.ai/fix-in-ide?tool=cursor&prompt_id=79f82d25a94843c6b936c59c81318a79&service=github&base_url=https%3A%2F%2Fgithub.com&org=Bizionic-Tech&repo=Bizionic-Tech%2Fearnon) [![Fix in VSCode Claude](https://new-codeant-butcket.s3.us-west-1.amazonaws.com/badges/fix-in-vscode-claude-flat.svg)](https://app.codeant.ai/fix-in-ide?tool=vscode-claude&prompt_id=79f82d25a94843c6b936c59c81318a79&service=github&base_url=https%3A%2F%2Fgithub.com&org=Bizionic-Tech&repo=Bizionic-Tech%2Fearnon)\n<details>\n<summary><b>Prompt for AI Agent 🤖 </b></summary>\n\n```mdx\nThis is a comment left during a code review.\n\n**Path:** app/Http/Controllers/Api/BookingSettingsController.php\n**Line:** 937:937\n**Comment:**\n\t*Custom Rule: Batch blocked-date retrieval in the service and pass the results into slot generation; this call reaches a 28-day loop that queries blocked dates once for each open date.\n\nValidate the correctness of the flagged issue. If correct, How can I resolve this? If you propose a fix, implement it and please make it concise.\nOnce fix is implemented, also check other comments on the same PR, and ask user if the user wants to fix the rest of the comments as well. if said yes, then fetch all the comments validate the correctness and implement a minimal fix\n```\n</details>\n<a href='https://app.codeant.ai/feedback?pr_url=https%3A%2F%2Fgithub.com%2FBizionic-Tech%2Fearnon%2Fpull%2F114&comment_hash=2f196ea84743e99079e751871aabcb917e14e340668a69b10a67eb1f9d70ac20&reaction=like'>👍</a> | <a href='https://app.codeant.ai/feedback?pr_url=https%3A%2F%2Fgithub.com%2FBizionic-Tech%2Fearnon%2Fpull%2F114&comment_hash=2f196ea84743e99079e751871aabcb917e14e340668a69b10a67eb1f9d70ac20&reaction=dislike'>👎</a>",
+   "diff_hunk": "@@ -933,6 +933,12 @@ public function getUserPriceDurations(GetUserPriceDurationsRequest $request): Js\n                 ], 200);\n             }\n \n+            // Meetup services are priced per experience + duration, with meeting locations and open start times\n+            $meetup = $this->bookingSettingsService->getMeetupServiceSettings((int)$bookingSettingsId, (int)$availabilityId);",
+   "url": "https://github.com/Bizionic-Tech/earnon/pull/114#discussion_r4441218298",
+   "bot": "codeant-ai[bot]",
+   "created_at": "2026-11-02T10:21:51Z",
+   "updated_at": "2026-11-02T10:21:51Z",
+   "replies": [],
+   "removed": false,
+   "author": {
+    "email": "rajlaxmi@bizionictech.com",
+    "name": "Rajlaxmi",
+    "sha": "e9672611296333cb9e931abcbafe702afc0bdcc8",
+    "date": "2026-11-02T10:13:11Z",
+    "usable": true,
+    "source": "file"
+   }
+  },
+  {
+   "id": "c4441218314",
+   "gh_id": 4441218314,
+   "kind": "inline",
+   "path": "app/Http/Requests/StoreBookingRequest.php",
+   "line": 16,
+   "start_line": null,
+   "outdated": false,
+   "severity": "Major",
+   "rank": 1,
+   "category": "Custom rule",
+   "occurrence": null,
+   "suggestion": "Use the existing booking-settings repository to retrieve the setting instead of querying Eloquent directly in the Form Request, keeping database access behind the repository layer.",
+   "prompt": "This is a comment left during a code review.\n\n**Path:** app/Http/Requests/StoreBookingRequest.php\n**Line:** 16:16\n**Comment:**\n\t*Custom Rule: Use the existing booking-settings repository to retrieve the setting instead of querying Eloquent directly in the Form Request, keeping database access behind the repository layer.\n\nValidate the correctness of the flagged issue. If correct, How can I resolve this? If you propose a fix, implement it and please make it concise.\nOnce fix is implemented, also check other comments on the same PR, and ask user if the user wants to fix the rest of the comments as well. if said yes, then fetch all the comments validate the correctness and implement a minimal fix",
+   "body": "**Suggestion:** Use the existing booking-settings repository to retrieve the setting instead of querying Eloquent directly in the Form Request, keeping database access behind the repository layer.\n\n**Severity Level:** Major ⚠️ · 🏷️ `Custom_rule`\n<details>\n<summary><b>Rule source 📖 </b></summary>\n\nCodeAnt dashboard (rule \"rules-1790679788112-sc6voma24\")\n</details>\n\n[![Use CodeAnt Skill](https://new-codeant-butcket.s3.us-west-1.amazonaws.com/badges/use-codeant-skill-flat-v2.svg)](https://docs.codeant.ai/cli/resolve-pr-comments-skill) [![Fix in Cursor](https://new-codeant-butcket.s3.us-west-1.amazonaws.com/badges/fix-in-cursor-flat.svg)](https://app.codeant.ai/fix-in-ide?tool=cursor&prompt_id=91e9f76aac1b4c24bbf6b45d8876b6de&service=github&base_url=https%3A%2F%2Fgithub.com&org=Bizionic-Tech&repo=Bizionic-Tech%2Fearnon) [![Fix in VSCode Claude](https://new-codeant-butcket.s3.us-west-1.amazonaws.com/badges/fix-in-vscode-claude-flat.svg)](https://app.codeant.ai/fix-in-ide?tool=vscode-claude&prompt_id=91e9f76aac1b4c24bbf6b45d8876b6de&service=github&base_url=https%3A%2F%2Fgithub.com&org=Bizionic-Tech&repo=Bizionic-Tech%2Fearnon)\n<details>\n<summary><b>Prompt for AI Agent 🤖 </b></summary>\n\n```mdx\nThis is a comment left during a code review.\n\n**Path:** app/Http/Requests/StoreBookingRequest.php\n**Line:** 16:16\n**Comment:**\n\t*Custom Rule: Use the existing booking-settings repository to retrieve the setting instead of querying Eloquent directly in the Form Request, keeping database access behind the repository layer.\n\nValidate the correctness of the flagged issue. If correct, How can I resolve this? If you propose a fix, implement it and please make it concise.\nOnce fix is implemented, also check other comments on the same PR, and ask user if the user wants to fix the rest of the comments as well. if said yes, then fetch all the comments validate the correctness and implement a minimal fix\n```\n</details>\n<a href='https://app.codeant.ai/feedback?pr_url=https%3A%2F%2Fgithub.com%2FBizionic-Tech%2Fearnon%2Fpull%2F114&comment_hash=948b66e6293cebdd480b09175e24b68d2cc9b82ecd9d8bc9638069a096f35df8&reaction=like'>👍</a> | <a href='https://app.codeant.ai/feedback?pr_url=https%3A%2F%2Fgithub.com%2FBizionic-Tech%2Fearnon%2Fpull%2F114&comment_hash=948b66e6293cebdd480b09175e24b68d2cc9b82ecd9d8bc9638069a096f35df8&reaction=dislike'>👎</a>",
+   "diff_hunk": "@@ -13,8 +13,15 @@ public function authorize()\n     \n     public function rules()\n     {\n+        $setting = \\App\\Models\\BookingSettings::find($this->input('booking_settings_id'));",
+   "url": "https://github.com/Bizionic-Tech/earnon/pull/114#discussion_r4441218314",
+   "bot": "codeant-ai[bot]",
+   "created_at": "2026-11-02T10:21:51Z",
+   "updated_at": "2026-11-02T10:21:51Z",
+   "replies": [],
+   "removed": false,
+   "author": {
+    "email": "rajlaxmi@bizionictech.com",
+    "name": "Rajlaxmi",
+    "sha": "e9672611296333cb9e931abcbafe702afc0bdcc8",
+    "date": "2026-11-02T10:13:11Z",
+    "usable": true,
+    "source": "file"
+   }
+  },
+  {
+   "id": "c4441218333",
+   "gh_id": 4441218333,
+   "kind": "inline",
+   "path": "app/Services/BookingSettingsService.php",
+   "line": 1725,
+   "start_line": null,
+   "outdated": false,
+   "severity": "Major",
+   "rank": 1,
+   "category": "Custom rule",
+   "occurrence": null,
+   "suggestion": "Fetch blocked dates once before generating the date range and pass that collection into the slot-generation path instead of reloading it for each date.",
+   "prompt": "This is a comment left during a code review.\n\n**Path:** app/Services/BookingSettingsService.php\n**Line:** 1725:1725\n**Comment:**\n\t*Custom Rule: Fetch blocked dates once before generating the date range and pass that collection into the slot-generation path instead of reloading it for each date.\n\nValidate the correctness of the flagged issue. If correct, How can I resolve this? If you propose a fix, implement it and please make it concise.\nOnce fix is implemented, also check other comments on the same PR, and ask user if the user wants to fix the rest of the comments as well. if said yes, then fetch all the comments validate the correctness and implement a minimal fix",
+   "body": "**Suggestion:** Fetch blocked dates once before generating the date range and pass that collection into the slot-generation path instead of reloading it for each date.\n\n**Severity Level:** Major ⚠️ · 🏷️ `Custom_rule`\n<details>\n<summary><b>Rule source 📖 </b></summary>\n\nCodeAnt dashboard (rule \"rules-1791630715722-yoypjvtra\")\n</details>\n\n[![Use CodeAnt Skill](https://new-codeant-butcket.s3.us-west-1.amazonaws.com/badges/use-codeant-skill-flat-v2.svg)](https://docs.codeant.ai/cli/resolve-pr-comments-skill) [![Fix in Cursor](https://new-codeant-butcket.s3.us-west-1.amazonaws.com/badges/fix-in-cursor-flat.svg)](https://app.codeant.ai/fix-in-ide?tool=cursor&prompt_id=d8808519bec2460ba1bf93b9fee843b2&service=github&base_url=https%3A%2F%2Fgithub.com&org=Bizionic-Tech&repo=Bizionic-Tech%2Fearnon) [![Fix in VSCode Claude](https://new-codeant-butcket.s3.us-west-1.amazonaws.com/badges/fix-in-vscode-claude-flat.svg)](https://app.codeant.ai/fix-in-ide?tool=vscode-claude&prompt_id=d8808519bec2460ba1bf93b9fee843b2&service=github&base_url=https%3A%2F%2Fgithub.com&org=Bizionic-Tech&repo=Bizionic-Tech%2Fearnon)\n<details>\n<summary><b>Prompt for AI Agent 🤖 </b></summary>\n\n```mdx\nThis is a comment left during a code review.\n\n**Path:** app/Services/BookingSettingsService.php\n**Line:** 1725:1725\n**Comment:**\n\t*Custom Rule: Fetch blocked dates once before generating the date range and pass that collection into the slot-generation path instead of reloading it for each date.\n\nValidate the correctness of the flagged issue. If correct, How can I resolve this? If you propose a fix, implement it and please make it concise.\nOnce fix is implemented, also check other comments on the same PR, and ask user if the user wants to fix the rest of the comments as well. if said yes, then fetch all the comments validate the correctness and implement a minimal fix\n```\n</details>\n<a href='https://app.codeant.ai/feedback?pr_url=https%3A%2F%2Fgithub.com%2FBizionic-Tech%2Fearnon%2Fpull%2F114&comment_hash=37ccf67608845b1a14a24b8a086292f11b1a5cc7707cd6072e04de5d8fa62ed5&reaction=like'>👍</a> | <a href='https://app.codeant.ai/feedback?pr_url=https%3A%2F%2Fgithub.com%2FBizionic-Tech%2Fearnon%2Fpull%2F114&comment_hash=37ccf67608845b1a14a24b8a086292f11b1a5cc7707cd6072e04de5d8fa62ed5&reaction=dislike'>👎</a>",
+   "diff_hunk": "@@ -1705,6 +1713,19 @@ public function getMeetupRequestData(User $creator, BookingSettings $setting, Av\n         ];\r\n     }\r\n \r\n+    // Meetup request data for the app (same as the web request page); null when not a meetup service\r\n+    public function getMeetupServiceSettings(int $bookingSettingsId, int $availabilityId): ?array\r\n+    {\r\n+        $setting = $this->findById($bookingSettingsId);\r\n+        $availability = $setting?->isMeetupService()\r\n+            ? $this->creatorBookingRepository->getAvailabilityByIdAndSettings($availabilityId, $bookingSettingsId)\r\n+            : null;\r\n+\r\n+        return $availability?->user\r\n+            ? ['creator_id' => $availability->user_id] + $this->getMeetupRequestData($availability->user, $setting, $availability)\r",
+   "url": "https://github.com/Bizionic-Tech/earnon/pull/114#discussion_r4441218333",
+   "bot": "codeant-ai[bot]",
+   "created_at": "2026-11-02T10:21:51Z",
+   "updated_at": "2026-11-02T10:21:51Z",
+   "replies": [],
+   "removed": false,
+   "author": {
+    "email": "rajlaxmi@bizionictech.com",
+    "name": "Rajlaxmi",
+    "sha": "e9672611296333cb9e931abcbafe702afc0bdcc8",
+    "date": "2026-11-02T10:13:11Z",
+    "usable": true,
+    "source": "file"
+   }
+  }
+ ],
+ "sections": [
+  {
+   "kind": "status",
+   "title": "Review status",
+   "body": "## <a href=\"https://codeant.ai/\" title=\"CodeAnt AI\"><img src=\"https://new-codeant-butcket.s3.us-west-1.amazonaws.com/badges/codeant-block-purple-v2.svg\" width=\"28\" height=\"28\" align=\"absmiddle\" style=\"vertical-align:middle\" alt=\"CodeAnt\" /></a>&nbsp; CodeAnt Review Status\n\n**🔄&nbsp; Review in progress**\n\n| Status | Commit | Started (UTC) | Finished (UTC) |\n| --- | --- | --- | --- |\n| 🔄&nbsp; `#ca9c5` Reviewing your PR… | `fc1adb1` | Nov 02, 2026 · 10:19 | — |\n\n<!-- codeant-review-status:[{\"run_id\":\"ca9c5e653b9c\",\"label\":\"Reviewing your PR\\u2026\",\"commit\":\"fc1adb179a066e82c822ffedec62a95c09c5d992\",\"started\":\"2026-11-02T10:19:00.722992\",\"finished\":null,\"done\":false}] -->",
+   "url": "https://github.com/Bizionic-Tech/earnon/pull/114#issuecomment-6574667034",
+   "created_at": "2026-11-02T10:19:01Z",
+   "status_line": "Status: 🔄&nbsp; #ca9c5 Reviewing your PR…  |  Commit: fc1adb1  |  Started (UTC): Nov 02, 2026 · 10:19"
+  },
+  {
+   "kind": "quality",
+   "title": "Quality gate",
+   "body": "## <a href=\"https://app.codeant.ai/quality-gates/results?repo=Bizionic-Tech/earnon&amp;commit_id=fc1adb179a066e82c822ffedec62a95c09c5d992&amp;service=github\"><img src=\"https://new-codeant-butcket.s3.us-west-1.amazonaws.com/badges/view-results-purple-v2.svg\" align=\"right\" alt=\"View results\" /></a> <a href=\"https://codeant.ai/\" title=\"CodeAnt AI\"><img src=\"https://new-codeant-butcket.s3.us-west-1.amazonaws.com/badges/codeant-block-purple-v2.svg\" width=\"28\" height=\"28\" align=\"absmiddle\" style=\"vertical-align:middle\" alt=\"CodeAnt\" /></a>&nbsp; CodeAnt Quality Gate Results\n\n<sub>Commit <code>fc1adb17</code> · Scanned Nov 02, 2026 at 10:21 UTC</sub>\n\n✅&nbsp; **Overall Status: PASSED**\n\n| Quality Gate | Status | Details |\n|:-------------|:------:|:--------|\n| **New code coverage** | ℹ️&nbsp; Not applicable | No coverage data found for the commit |\n| **Secrets** | ✅&nbsp; Passed | 0 secrets found |\n| **Duplicate code** | ✅&nbsp; Passed | 0.0% duplicated |\n| **SAST** | ✅&nbsp; Passed | No security issues |\n| **Bugs** | ✅&nbsp; Passed | Rating S · No bugs |\n| **IaC** | ✅&nbsp; Passed | No IAC issues |",
+   "url": "https://github.com/Bizionic-Tech/earnon/pull/114#issuecomment-6574719460",
+   "created_at": "2026-11-02T10:21:40Z"
+  },
+  {
+   "kind": "coverage",
+   "title": "Coverage",
+   "body": "# :bar_chart: CodeAnt Coverage Report\n\n**Commit:** `fc1adb17`\n**Scan Time:** 2026-11-02 10:21:41 UTC\n\n## :information_source: Status: Not applicable\n\n## Coverage Metrics\n\n| Metric | Value | Status |\n|--------|-------|--------|\n| **New Code Coverage** | No coverage data found for the commit | :information_source: Not applicable |\n\nNew-code coverage threshold not configured; coverage is reported but not enforced.\n\nOverall coverage is informational; no total-coverage threshold is enforced.\n\n### Details\n**New Code Coverage:** No coverage data found for the commit\n\n[View Coverage Report](https://app.codeant.ai/pr/analysis/coverage/test-coverage/?repo=Bizionic-Tech/earnon&module=&commit_id=fc1adb179a066e82c822ffedec62a95c09c5d992&service=github)\n",
+   "url": "https://github.com/Bizionic-Tech/earnon/pull/114#issuecomment-6574719884",
+   "created_at": "2026-11-02T10:21:41Z"
+  }
+ ],
+ "slack": {
+  "at": "2026-11-02T16:13:06+05:30",
+  "delivered": true,
+  "how": "summary+link",
+  "error": null,
+  "link": "http://127.0.0.1:5000/reports/earnon-pr114-20261102-154856.html"
+ },
+ "updated_at": "2026-11-02T16:13:07+05:30",
+ "summary": {
+  "total": 4,
+  "by_severity": {
+   "Critical": 1,
+   "Major": 3,
+   "Medium": 0,
+   "Minor": 0,
+   "Info": 0
+  },
+  "files": 3,
+  "jira": 0
+ },
+ "finished_at": "2026-11-02T16:13:06+05:30"
+}
